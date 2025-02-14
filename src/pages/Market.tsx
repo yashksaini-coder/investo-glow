@@ -1,18 +1,19 @@
-
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Star } from 'lucide-react';
+import TradingViewWidget from './TradingViewWidget';
 
 const Market = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedStock, setSelectedStock] = useState('NASDAQ:AAPL');
 
   const marketData = [
-    { symbol: 'AAPL', name: 'Apple Inc.', price: 150.23, change: 2.5 },
-    { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 2780.34, change: -1.2 },
-    { symbol: 'MSFT', name: 'Microsoft Corp.', price: 290.12, change: 1.8 },
-    { symbol: 'AMZN', name: 'Amazon.com Inc.', price: 3300.45, change: -0.5 },
+    { symbol: 'NASDAQ:AAPL', name: 'Apple Inc.', price: 150.23, change: 2.5 },
+    { symbol: 'NASDAQ:GOOGL', name: 'Alphabet Inc.', price: 2780.34, change: -1.2 },
+    { symbol: 'NASDAQ:MSFT', name: 'Microsoft Corp.', price: 290.12, change: 1.8 },
+    { symbol: 'NASDAQ:AMZN', name: 'Amazon.com Inc.', price: 3300.45, change: -0.5 },
   ];
 
   return (
@@ -34,17 +35,15 @@ const Market = () => {
 
       <div className="grid gap-4">
         {marketData.map((stock) => (
-          <Card key={stock.symbol} className="glass-panel">
+          <Card key={stock.symbol} className="glass-panel cursor-pointer" onClick={() => setSelectedStock(stock.symbol)}>
             <CardContent className="flex items-center justify-between p-4">
               <div>
-                <h3 className="text-lg font-semibold">{stock.symbol}</h3>
+                <h3 className="text-lg font-semibold">{stock.symbol.split(':')[1]}</h3>
                 <p className="text-sm text-muted-foreground">{stock.name}</p>
               </div>
               <div className="text-right">
                 <p className="text-lg font-semibold">${stock.price}</p>
-                <p className={`text-sm ${stock.change >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                  {stock.change >= 0 ? '+' : ''}{stock.change}%
-                </p>
+                <p className={`text-sm ${stock.change >= 0 ? 'text-green-500' : 'text-red-500'}`}>{stock.change >= 0 ? '+' : ''}{stock.change}%</p>
               </div>
               <Button variant="ghost" size="icon">
                 <Star className="h-4 w-4" />
@@ -52,6 +51,10 @@ const Market = () => {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      <div className="mt-8">
+        <TradingViewWidget />
       </div>
     </div>
   );
