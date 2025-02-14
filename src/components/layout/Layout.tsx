@@ -15,7 +15,6 @@ const Layout = ({ children }: LayoutProps) => {
       <main className="flex-1 pt-16 container mx-auto px-4">
         {children}
       </main>
-      <ChatBot />
       <Footer />
     </div>
   );
