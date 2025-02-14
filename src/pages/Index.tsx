@@ -56,21 +56,28 @@ const Index = () => {
           </div>
         </Card>
 
+        
         <Card className="glass-panel p-6">
-          <h2 className="text-xl font-semibold mb-4">Ask me about any cryptocurrency</h2>
-          <p className="text-muted-foreground mb-4">
-            Get real-time insights and analysis about any crypto asset
-          </p>
-          <div className="flex gap-2">
-            <Input 
-              placeholder="Ask about cryptocurrency..." 
-              className="bg-background/50"
-            />
-            <Button size="icon">
-              <Send className="h-4 w-4" />
-            </Button>
-          </div>
-        </Card>
+            <h3 className="text-3xl font-semibold mb-4">Trending Updates</h3>
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+          <TrendingUp className="h-4 w-4 text-green-400" />
+          <span>Bitcoin breaks $45,000 resistance level</span>
+              </div>
+              <div className="flex items-center gap-2">
+          <TrendingUp className="h-4 w-4 text-green-400" />
+          <span>ETH 2.0 staking reaches new milestone</span>
+              </div>
+              <div className="flex items-center gap-2">
+          <TrendingUp className="h-4 w-4 text-green-400" />
+          <span>New regulatory framework announced</span>
+              </div>
+              <div className="flex items-center gap-2">
+          <TrendingUp className="h-4 w-4 text-green-400" />
+          <span>Japanese Energy Firm Boosts Crypto Holdings More Than 8,000% in 9 Months</span>
+              </div>
+            </div>
+          </Card>
       </div>
 
       {/* Featured Cryptocurrencies */}
