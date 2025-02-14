@@ -81,3 +81,7 @@
     transform: translateY(0);
   }
 }
+.tradingview-widget-container {
+  height: 30rem !important;
+  width: 100% !important;
+}
