@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
@@ -40,25 +39,25 @@
 
   [data-theme='squid-game'] {
     --background: 0 0% 100%;
-    --foreground: 182 98% 24%;
+    --foreground: 334 86% 52%;
     
     --primary: 334 86% 52%;
     --primary-foreground: 0 0% 100%;
     
-    --secondary: 338 71% 62%;
+    --secondary: 181 64% 38%;
     --secondary-foreground: 0 0% 100%;
     
     --muted: 181 64% 38%;
-    --muted-foreground: 0 0% 100%;
+    --muted-foreground: 334 86% 52%;
     
     --accent: 181 64% 38%;
     --accent-foreground: 0 0% 100%;
     
     --popover: 0 0% 100%;
-    --popover-foreground: 182 98% 24%;
+    --popover-foreground: 334 86% 52%;
     
     --card: 0 0% 100%;
-    --card-foreground: 182 98% 24%;
+    --card-foreground: 334 86% 52%;
     
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
@@ -120,4 +119,52 @@
 .tradingview-widget-container {
   height: 30rem !important;
   width: 100% !important;
+}
+
+/* Add additional styles for specific text elements */
+[data-theme='squid-game'] {
+  /* Make headings and important text pink */
+  h1, h2, h3, h4, h5, h6 {
+    color: #ed1b76 !important;
+  }
+  
+  /* Make regular text teal for contrast */
+  p, span, div {
+    color: #037a76;
+  }
+  
+  /* Make links and interactive elements pink with teal hover */
+  a:not([class*="button"]) {
+    color: #ed1b76;
+  }
+  
+  a:not([class*="button"]):hover {
+    color: #037a76;
+  }
+  
+  /* Make form input text pink */
+  input, textarea, select {
+    color: #ed1b76 !important;
+  }
+  
+  /* Make placeholder text teal */
+  ::placeholder {
+    color: #037a76 !important;
+    opacity: 0.7;
+  }
+  
+  /* Make muted text pink but slightly transparent */
+  .text-muted-foreground {
+    color: #ed1b76 !important;
+    opacity: 0.8;
+  }
+  
+  /* Make card titles and content more visible */
+  .card-title {
+    color: #037a76	(3,122,118) !important;
+  }
+  
+  .card-content {
+    color: #037a76 !important;
+  }
 }
