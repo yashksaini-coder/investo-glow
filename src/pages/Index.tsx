@@ -1,20 +1,50 @@
-
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { Bitcoin, Send, TrendingUp } from 'lucide-react';
+import { format, subDays } from 'date-fns';
+import { useQuery } from '@tanstack/react-query';
 
-// Mock data for the price chart
-const priceData = [
-  { date: '01/01', price: 42000 },
-  { date: '01/02', price: 43500 },
-  { date: '01/03', price: 42800 },
-  { date: '01/04', price: 44000 },
-  { date: '01/05', price: 43200 },
-  { date: '01/06', price: 45000 },
-  { date: '01/07', price: 44500 },
+// Types for our price data
+interface PriceData {
+  date: string;
+  price: number;
+}
+
+interface CryptoOption {
+  id: string;
+  name: string;
+  symbol: string;
+}
+
+const cryptoOptions: CryptoOption[] = [
+  { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC' },
+  { id: 'ethereum', name: 'Ethereum', symbol: 'ETH' },
+  { id: 'binancecoin', name: 'BNB', symbol: 'BNB' },
+  { id: 'ripple', name: 'XRP', symbol: 'XRP' },
 ];
+
+// Function to fetch price data from CoinGecko
+const fetchPriceData = async (cryptoId: string): Promise<PriceData[]> => {
+  const endDate = new Date();
+  const startDate = subDays(endDate, 30);
+  const response = await fetch(
+    `https://api.coingecko.com/api/v3/coins/${cryptoId}/market_chart/range?vs_currency=usd&from=${Math.floor(startDate.getTime() / 1000)}&to=${Math.floor(endDate.getTime() / 1000)}`
+  );
+  
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  const data = await response.json();
+  return data.prices.map(([timestamp, price]: [number, number]) => ({
+    date: format(new Date(timestamp), 'MM/dd'),
+    price: parseFloat(price.toFixed(2))
+  }));
+};
 
 // Mock data for featured cryptocurrencies
 const featuredCryptos = [
@@ -31,27 +61,73 @@ const cryptoNews = [
 ];
 
 const Index = () => {
+  const [selectedCrypto, setSelectedCrypto] = useState<string>(cryptoOptions[0].id);
+
+  const { data: priceData, isLoading } = useQuery({
+    queryKey: ['cryptoPrice', selectedCrypto],
+    queryFn: () => fetchPriceData(selectedCrypto),
+    refetchInterval: 300000, // Refetch every 5 minutes
+  });
+
   return (
     <div className="min-h-screen">
       {/* Hero Section with Chart */}
       <div className="grid md:grid-cols-2 gap-8 mb-12">
         <Card className="glass-panel p-6">
-          <h2 className="text-xl font-semibold mb-4">Bitcoin Price Chart (30 Days)</h2>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-semibold">Price Chart (30 Days)</h2>
+            <Select
+              value={selectedCrypto}
+              onValueChange={setSelectedCrypto}
+            >
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {cryptoOptions.map((crypto) => (
+                  <SelectItem key={crypto.id} value={crypto.id}>
+                    {crypto.symbol}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={priceData}>
-                <XAxis dataKey="date" stroke="#666" />
-                <YAxis stroke="#666" />
-                <Tooltip contentStyle={{ background: '#1a1f2c', border: 'none' }} />
-                <Line 
-                  type="monotone" 
-                  dataKey="price" 
-                  stroke="#9b87f5" 
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            {isLoading ? (
+              <div className="h-full flex items-center justify-center">
+                <p className="text-muted-foreground">Loading chart data...</p>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={priceData}>
+                  <XAxis 
+                    dataKey="date" 
+                    stroke="#666"
+                    tickLine={false}
+                    axisLine={false}
+                    fontSize={12}
+                  />
+                  <YAxis 
+                    stroke="#666"
+                    tickLine={false}
+                    axisLine={false}
+                    fontSize={12}
+                    tickFormatter={(value) => `$${value.toLocaleString()}`}
+                  />
+                  <Tooltip 
+                    contentStyle={{ background: '#1a1f2c', border: 'none' }}
+                    formatter={(value: number) => [`$${value.toLocaleString()}`, 'Price']}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="price" 
+                    stroke="#9b87f5" 
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </Card>
 
