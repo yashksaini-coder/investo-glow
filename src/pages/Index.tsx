@@ -35,7 +35,7 @@ const fetchPriceData = async (cryptoId: string): Promise<PriceData[]> => {
   const response = await fetch(
     `https://api.coingecko.com/api/v3/coins/${cryptoId}/market_chart/range?vs_currency=usd&from=${Math.floor(startDate.getTime() / 1000)}&to=${Math.floor(endDate.getTime() / 1000)}`
   );
-  
+  // TODO: Add AI agent query to fetch price data instead of coingecko
   if (!response.ok) {
     throw new Error('Network response was not ok');
   }

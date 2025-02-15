@@ -18,7 +18,7 @@ const Market = () => {
 
   return (
     <div className="py-8">
-      <div className="flex justify-between items-center mb-6">
+      {/* <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Market</h1>
         <div className="flex gap-4">
           <div className="relative">
@@ -51,7 +51,7 @@ const Market = () => {
             </CardContent>
           </Card>
         ))}
-      </div>
+      </div> */}
 
       <div className="mt-8">
         <TradingViewWidget />
