@@ -37,6 +37,36 @@
     
     --radius: 0.75rem;
   }
+
+  [data-theme='squid-game'] {
+    --background: 0 0% 100%;
+    --foreground: 182 98% 24%;
+    
+    --primary: 334 86% 52%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 338 71% 62%;
+    --secondary-foreground: 0 0% 100%;
+    
+    --muted: 181 64% 38%;
+    --muted-foreground: 0 0% 100%;
+    
+    --accent: 181 64% 38%;
+    --accent-foreground: 0 0% 100%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 182 98% 24%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 182 98% 24%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 334 86% 52%;
+    --input: 334 86% 52%;
+    --ring: 334 86% 52%;
+  }
 }
 
 @layer base {
@@ -61,6 +91,11 @@
   .hover-effect {
     @apply transition-all duration-300 ease-in-out hover:scale-[1.02];
   }
+
+  .theme-toggle {
+    @apply fixed bottom-4 right-4 p-2 rounded-full bg-primary text-primary-foreground 
+           hover:bg-secondary transition-colors duration-200 z-50;
+  }
 }
 
 .text-gradient {
@@ -81,6 +116,7 @@
     transform: translateY(0);
   }
 }
+
 .tradingview-widget-container {
   height: 30rem !important;
   width: 100% !important;
