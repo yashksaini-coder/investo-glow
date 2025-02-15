@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { Bitcoin, Send, TrendingUp, ExternalLink, Newspaper } from 'lucide-react';
-import { format, subDays } from 'date-fns';
+import { format} from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
 
 // Types for our price data
@@ -31,7 +31,7 @@ const cryptoOptions: CryptoOption[] = [
 // Function to fetch price data from CoinGecko
 const fetchPriceData = async (cryptoId: string): Promise<PriceData[]> => {
   const endDate = new Date();
-  const startDate = subDays(endDate, 30);
+  const startDate = new Date(endDate.getTime() - (30 * 24 * 60 * 60 * 1000));
   const response = await fetch(
     `https://api.coingecko.com/api/v3/coins/${cryptoId}/market_chart/range?vs_currency=usd&from=${Math.floor(startDate.getTime() / 1000)}&to=${Math.floor(endDate.getTime() / 1000)}`
   );
