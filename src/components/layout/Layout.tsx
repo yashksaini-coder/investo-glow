@@ -2,7 +2,6 @@
 import { ReactNode } from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
-import ChatBot from '../ChatBot';
 
 interface LayoutProps {
   children: ReactNode;

@@ -2,6 +2,8 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/components/ui/use-toast';
 
 interface AuthContextType {
   session: Session | null;
@@ -13,6 +15,28 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const RequireAuth = ({ children }: { children: React.ReactNode }) => {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please login or register to access this page",
+        variant: "destructive",
+      });
+      navigate('/login');
+    }
+  }, [user, loading, navigate]);
+
+  if (loading) return <div>Loading...</div>;
+  if (!user) return null;
+
+  return <>{children}</>;
+};
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
