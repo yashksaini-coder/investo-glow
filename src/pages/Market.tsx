@@ -22,7 +22,7 @@ const Market = () => {
     const fetchStockData = async () => {
 
       try {
-        const response = await fetch('https://stocks-api-wne4.onrender.com/top-stocks');  
+        const response = await fetch(process.env.ServerURL + '/top-stocks');  
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
