@@ -19,7 +19,7 @@ interface StockData {
   sector: string;
 }
 
-const stock_url = "https://investo-server-1.onrender.com/";
+const stock_url = "Stock-URL/";
 
 export default function MarketPage() {
   const [searchQuery, setSearchQuery] = useState('');
