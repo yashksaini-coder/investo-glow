@@ -19,7 +19,7 @@ interface StockData {
   sector: string;
 }
 
-const stock_url = "Stock-URL/";
+const stock_url = import.meta.env.VITE_PUBLIC_SERVER_URL;
 
 export default function MarketPage() {
   const [searchQuery, setSearchQuery] = useState('');
