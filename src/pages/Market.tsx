@@ -22,7 +22,7 @@ const Market = () => {
     const fetchStockData = async () => {
 
       try {
-        const response = await fetch('http://localhost:8000/top-stocks'); //subject to change when the fastapi is hosted 
+        const response = await fetch('https://stocks-api-wne4.onrender.com/top-stocks');  
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -89,7 +89,7 @@ const Market = () => {
 
 
       <div className="mt-8">
-        <TradingViewWidget />
+        <TradingViewWidget  />
       </div>
     </div>
   );
