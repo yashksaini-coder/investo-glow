@@ -12,6 +12,8 @@ interface StockData {
   sector: string;
 }
 
+const stock_url = import.meta.env.VITE_PUBLIC_SERVER_URL;
+
 const Market = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [marketData, setMarketData] = useState<StockData[]>([]);
@@ -23,7 +25,7 @@ const Market = () => {
     stock.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
     stock.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  const stock_url = import.meta.env.VITE_PUBLIC_SERVER_URL;
+  
   useEffect(() => {
     const fetchStockData = async () => {
       setLoading(true);
