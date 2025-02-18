@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -33,9 +33,14 @@ const fetchPriceData = async (cryptoId: string): Promise<PriceData[]> => {
   const endDate = new Date();
   const startDate = new Date(endDate.getTime() - (30 * 24 * 60 * 60 * 1000));
   const response = await fetch(
-    `https://api.coingecko.com/api/v3/coins/${cryptoId}/market_chart/range?vs_currency=usd&from=${Math.floor(startDate.getTime() / 1000)}&to=${Math.floor(endDate.getTime() / 1000)}`
+    `https://api.coingecko.com/api/v3/coins/${cryptoId}/market_chart/range?vs_currency=usd&from=${Math.floor(startDate.getTime() / 1000)}&to=${Math.floor(endDate.getTime() / 1000)}`,
+    {
+      headers: {
+        'Accept': 'application/json',
+      }
+    }
   );
-  // TODO: Add AI agent query to fetch price data instead of coingecko
+  
   if (!response.ok) {
     throw new Error('Network response was not ok');
   }
@@ -47,12 +52,33 @@ const fetchPriceData = async (cryptoId: string): Promise<PriceData[]> => {
   }));
 };
 
-// Function to fetch crypto news
-const fetchCryptoNews = async () => {
-  const response = await fetch('https://api.coingecko.com/api/v3/news');
-  if (!response.ok) throw new Error('Failed to fetch news');
-  return response.json();
-};
+// Latest market updates - Static fallback data
+const marketUpdates = [
+  {
+    id: 1,
+    title: "Bitcoin Surpasses $45,000 Mark",
+    description: "BTC breaks key resistance level amid increased institutional interest",
+    type: "price",
+  },
+  {
+    id: 2,
+    title: "Ethereum Network Upgrade",
+    description: "ETH 2.0 staking surpasses $30B in total value locked",
+    type: "technology",
+  },
+  {
+    id: 3,
+    title: "Global Crypto Regulations",
+    description: "New regulatory framework announced for digital assets",
+    type: "regulation",
+  },
+  {
+    id: 4,
+    title: "DeFi Market Growth",
+    description: "Total value locked in DeFi protocols reaches new ATH",
+    type: "defi",
+  },
+];
 
 const Index = () => {
   const [selectedCrypto, setSelectedCrypto] = useState<string>(cryptoOptions[0].id);
@@ -61,12 +87,8 @@ const Index = () => {
     queryKey: ['cryptoPrice', selectedCrypto],
     queryFn: () => fetchPriceData(selectedCrypto),
     refetchInterval: 300000, // Refetch every 5 minutes
-  });
-
-  const { data: newsData, isLoading: isNewsLoading } = useQuery({
-    queryKey: ['cryptoNews'],
-    queryFn: fetchCryptoNews,
-    refetchInterval: 600000, // Refetch every 10 minutes
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   return (
@@ -155,26 +177,16 @@ const Index = () => {
           </div>
         </Card>
 
-        {/* Trending Updates Card */}
+        {/* Market Updates Card */}
         <Card className="glass-panel p-6">
-          <h3 className="text-3xl font-semibold mb-4">Trending Updates</h3>
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-green-400" />
-              <span>Bitcoin breaks $45,000 resistance level</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-green-400" />
-              <span>ETH 2.0 staking reaches new milestone</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-green-400" />
-              <span>New regulatory framework announced</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-green-400" />
-              <span>Japanese Energy Firm Boosts Crypto Holdings More Than 8,000% in 9 Months</span>
-            </div>
+          <h3 className="text-2xl font-semibold mb-6">Market Updates</h3>
+          <div className="space-y-6">
+            {marketUpdates.map((update) => (
+              <div key={update.id} className="border-b border-border pb-4 last:border-0 last:pb-0">
+                <h4 className="font-medium mb-1">{update.title}</h4>
+                <p className="text-sm text-muted-foreground">{update.description}</p>
+              </div>
+            ))}
           </div>
         </Card>
       </div>
