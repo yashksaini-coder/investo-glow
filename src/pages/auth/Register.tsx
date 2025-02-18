@@ -130,7 +130,7 @@ const Register = () => {
             <label className="block mb-2 text-sm text-muted-foreground">
               Profile Picture
             </label>
-            <Input type="file" accept="image/*" onChange={handleFileChange} className="file:mr-4 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 py-[2px]" />
+            <Input type="file" accept="image/*" onChange={handleFileChange} className="file:mr-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90 my-[10px] mx-0 px-[19px] py-[8px]" />
           </div>
           <Button className="w-full" disabled={loading}>
             {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
