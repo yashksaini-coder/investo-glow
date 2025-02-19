@@ -67,16 +67,16 @@ const Profile = () => {
         <CardHeader className="text-center">
           <div className="w-24 h-24 rounded-full mx-auto mb-4 overflow-hidden bg-accent">
             {profileData?.profile_picture_url ? (
-              <img 
-                src={profileData.profile_picture_url} 
-                alt="Profile" 
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <User className="w-12 h-12 text-accent-foreground" />
-              </div>
-            )}
+                    <img 
+                    src={profileData.profile_picture_url} 
+                    alt="Profile" 
+                    className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                    <User className="w-16 h-16 text-accent-foreground" />
+                    </div>
+                  )}
           </div>
           <CardTitle>{profileData?.username || 'Loading...'}</CardTitle>
         </CardHeader>
