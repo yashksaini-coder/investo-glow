@@ -80,7 +80,7 @@ const About = () => {
               <div className="p-4 space-y-4">
                 <div className="w-48 h-48 mx-auto overflow-hidden rounded-lg">
                   <img 
-                    src={member.image} 
+                    src={member.image || "https://media-hosting.imagekit.io//4cd2278a98dc48b7/avatartion.png?Expires=1834756133&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=C22MhmrFRMR7CvIFLEiKPJXpMajmfNCx1qck~A5IntB83b5frqFUZ0PazWm8sfdmG2BMTSL9QNzode5Wf2H3K9BP5UeSjrf23g5TBC7OD3LkBqWcgIAsAlvEzOhqaeUdYBxCLZxPdpyccoLUTA8VRU78YTd-qHiLc9jVyLuwY2jw6m6pSFQFv6BPe0Kc3CXzy4D9IF3ik9-8aLpMp6epx~ny18zfpjy1moYl1e4OQV8JC4A4L0Cn4qCyAPqtvYpZvYOLehrpnFp9VdOhdSK70TMg8SoxjQm4cXjnmQPZw-069tztsZucIlSEWDlMcByL0zDmAmigCMnxrLM3vGKUog__"} 
                     alt={member.name} 
                     className="w-full h-full object-cover"
                   />
