@@ -1,6 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Users, Shield, TrendingUp } from 'lucide-react';
+import { BookOpen, Users, Shield, TrendingUp, Linkedin, Twitter, Github } from 'lucide-react';
+import { teamMembers } from "@/data/teamMembers";
 
 const About = () => {
   return (
@@ -71,19 +72,60 @@ const About = () => {
         </CardContent>
       </Card>
 
-      <Card className="glass-panel">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-orange-400" />
-            Our Team
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground text-center">
-            We're a team of passionate developers, financial experts, and AI specialists working together to revolutionize the investment experience.
-          </p>
-        </CardContent>
-      </Card>
+      <div className="space-y-6">
+        <h2 className="text-3xl font-bold text-center mb-8">Meet Our Team</h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          {teamMembers.map((member) => (
+            <Card key={member.id} className="glass-panel hover:scale-105 transition-transform duration-300">
+              <div className="p-4 space-y-4">
+                <div className="w-48 h-48 mx-auto overflow-hidden rounded-lg">
+                  <img 
+                    src={member.image} 
+                    alt={member.name} 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="text-center">
+                  <h3 className="text-xl font-semibold">{member.name}</h3>
+                  <p className="text-muted-foreground mt-1">{member.role}</p>
+                </div>
+                <div className="flex justify-center gap-4 pt-2">
+                  {member.socialLinks.linkedin && (
+                    <a 
+                      href={member.socialLinks.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <Linkedin className="h-5 w-5" />
+                    </a>
+                  )}
+                  {member.socialLinks.twitter && (
+                    <a 
+                      href={member.socialLinks.twitter}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <Twitter className="h-5 w-5" />
+                    </a>
+                  )}
+                  {member.socialLinks.github && (
+                    <a 
+                      href={member.socialLinks.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <Github className="h-5 w-5" />
+                    </a>
+                  )}
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
