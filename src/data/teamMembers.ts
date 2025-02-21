@@ -46,15 +46,4 @@ export const teamMembers: TeamMember[] = [
       github: "https://github.com/kushagra21-afk"
     }
   },
-  {
-    id: 3,
-    name: "Tannu Chaudhary",
-    role: "UI/UX Designer",
-    image: "https://avatars.githubusercontent.com/u/142585725?v=4",
-    socialLinks: {
-      linkedin: "https://linkedin.com/in/tannuchaudhary",
-      twitter: "https://twitter.com/tannuchaudhary",
-      github: "https://github.com/tannuiscoding",
-    }
-  }
 ];
