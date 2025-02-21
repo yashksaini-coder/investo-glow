@@ -89,38 +89,40 @@ const About = () => {
                   <h3 className="text-xl font-semibold">{member.name}</h3>
                   <p className="text-muted-foreground mt-1">{member.role}</p>
                 </div>
-                <div className="flex justify-center gap-4 pt-2">
-                  {member.socialLinks.linkedin && (
-                    <a 
-                      href={member.socialLinks.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      <Linkedin className="h-5 w-5" />
-                    </a>
-                  )}
-                  {member.socialLinks.twitter && (
-                    <a 
-                      href={member.socialLinks.twitter}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      <Twitter className="h-5 w-5" />
-                    </a>
-                  )}
-                  {member.socialLinks.github && (
-                    <a 
-                      href={member.socialLinks.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      <Github className="h-5 w-5" />
-                    </a>
-                  )}
-                </div>
+                {Object.keys(member.socialLinks).length > 0 && (
+                  <div className="flex justify-center gap-4 pt-2">
+                    {member.socialLinks.linkedin && (
+                      <a 
+                        href={member.socialLinks.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <Linkedin className="h-5 w-5" />
+                      </a>
+                    )}
+                    {member.socialLinks.twitter && (
+                      <a 
+                        href={member.socialLinks.twitter}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <Twitter className="h-5 w-5" />
+                      </a>
+                    )}
+                    {member.socialLinks.github && (
+                      <a 
+                        href={member.socialLinks.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <Github className="h-5 w-5" />
+                      </a>
+                    )}
+                  </div>
+                )}
               </div>
             </Card>
           ))}

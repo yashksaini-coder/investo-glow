@@ -32,7 +32,6 @@ export const teamMembers: TeamMember[] = [
     image: "https://randomuser.me/api/portraits",
     socialLinks: {
       linkedin: "https://linkedin.com/in/johndoe",
-      twitter: "https://twitter.com/johndoe",
       github: "https://github.com/kushagra21-afk"
     }
   },
