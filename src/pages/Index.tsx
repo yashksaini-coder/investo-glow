@@ -1,6 +1,5 @@
-
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -8,6 +7,7 @@ import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'rec
 import { Bitcoin, Send, TrendingUp, ExternalLink, Newspaper } from 'lucide-react';
 import { format} from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 // Types for our price data
 interface PriceData {
@@ -19,6 +19,11 @@ interface CryptoOption {
   id: string;
   name: string;
   symbol: string;
+}
+
+interface NewsItem {
+  title: string;
+  url: string;
 }
 
 const cryptoOptions: CryptoOption[] = [
@@ -52,36 +57,41 @@ const fetchPriceData = async (cryptoId: string): Promise<PriceData[]> => {
   }));
 };
 
-// Latest market updates - Static fallback data
-const marketUpdates = [
-  {
-    id: 1,
-    title: "Bitcoin Surpasses $45,000 Mark",
-    description: "BTC breaks key resistance level amid increased institutional interest",
-    type: "price",
-  },
-  {
-    id: 2,
-    title: "Ethereum Network Upgrade",
-    description: "ETH 2.0 staking surpasses $30B in total value locked",
-    type: "technology",
-  },
-  {
-    id: 3,
-    title: "Global Crypto Regulations",
-    description: "New regulatory framework announced for digital assets",
-    type: "regulation",
-  },
-  {
-    id: 4,
-    title: "DeFi Market Growth",
-    description: "Total value locked in DeFi protocols reaches new ATH",
-    type: "defi",
-  },
-];
+const stock_url = import.meta.env.VITE_PUBLIC_SERVER_URL;
 
 const Index = () => {
   const [selectedCrypto, setSelectedCrypto] = useState<string>(cryptoOptions[0].id);
+  const [newsData, setNewsData] = useState<NewsItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchNewsData = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`${stock_url}stock-news`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        const formattedNews = data.map(([title, url]: [string, string]) => ({
+          title,
+          url
+        }));
+        setNewsData(formattedNews);
+        setError(null);
+      } catch (error) {
+        setError('Failed to fetch news data. Please try again later.');
+        console.error('Failed to fetch news data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNewsData();
+    const interval = setInterval(fetchNewsData, 300000); // Refresh every 5 minutes
+    return () => clearInterval(interval);
+  }, []);
 
   const { data: priceData, isLoading: isPriceLoading } = useQuery({
     queryKey: ['cryptoPrice', selectedCrypto],
@@ -179,15 +189,30 @@ const Index = () => {
 
         {/* Market Updates Card */}
         <Card className="glass-panel p-6">
-          <h3 className="text-2xl font-semibold mb-6">Market Updates</h3>
-          <div className="space-y-6">
-            {marketUpdates.map((update) => (
-              <div key={update.id} className="border-b border-border pb-4 last:border-0 last:pb-0">
-                <h4 className="font-medium mb-1">{update.title}</h4>
-                <p className="text-sm text-muted-foreground">{update.description}</p>
+          <h3 className="text-2xl font-semibold mb-6">Latest Market News</h3>
+          {loading ? (
+            <div className="text-center py-4">Loading news...</div>
+          ) : error ? (
+            <div className="text-center text-red-500 py-4">{error}</div>
+          ) : (
+            <ScrollArea className="h-[300px] w-full">
+              <div className="space-y-4">
+                {newsData.map((news, index) => (
+                  <div key={index} className="border-b border-border pb-4 last:border-0">
+                    <a 
+                      href={news.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="group flex items-start gap-2 hover:text-primary transition-colors"
+                    >
+                      <ExternalLink className="h-4 w-4 mt-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <h4 className="font-medium">{news.title}</h4>
+                    </a>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </ScrollArea>
+          )}
         </Card>
       </div>
 
