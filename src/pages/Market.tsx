@@ -53,7 +53,7 @@ export default function MarketPage() {
     };
 
     fetchStockData();
-    const interval = setInterval(fetchStockData, 5000);
+    const interval = setInterval(fetchStockData, 10000);
     return () => clearInterval(interval);
   }, []);
 
