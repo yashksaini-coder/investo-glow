@@ -195,8 +195,8 @@ const Index = () => {
           ) : error ? (
             <div className="text-center text-red-500 py-4">{error}</div>
           ) : (
-            <ScrollArea className="h-[300px] w-full">
-              <div className="space-y-4">
+            <ScrollArea className="h-[300px] md:h-[300px] w-full">
+              <div className="space-y-4 px-1">
                 {newsData.map((news, index) => (
                   <div key={index} className="border-b border-border pb-4 last:border-0">
                     <a 
@@ -206,7 +206,7 @@ const Index = () => {
                       className="group flex items-start gap-2 hover:text-primary transition-colors"
                     >
                       <ExternalLink className="h-4 w-4 mt-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <h4 className="font-medium">{news.title}</h4>
+                      <h4 className="font-medium text-sm md:text-base">{news.title}</h4>
                     </a>
                   </div>
                 ))}
