@@ -6,42 +6,114 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import FundamentalMetric from './FundamentalMetric';
 import FundamentalsInfoDialog from './FundamentalsInfoDialog';
 
-// Enhanced data for stock fundamentals
-const stockFundamentals = {
-  // Valuation Metrics
-  marketCap: "₹70,860Cr",
-  peRatio: "38.52",
-  pbRatio: "8.25",
-  industryPE: "35.78",
-  enterpriseValue: "₹69,421Cr",
-  evToEBITDA: "28.3",
-  
-  // Performance Metrics
-  roe: "20.88%",
-  roa: "15.24%",
-  roic: "22.15%",
-  operatingMargin: "27.6%",
-  netMargin: "19.3%",
-  
-  // Financial Metrics
-  debtToEquity: "0.02",
-  currentRatio: "3.85",
-  quickRatio: "3.42",
-  interestCoverage: "152.6x",
-  
-  // Per Share Data
-  eps: "₹122.28",
-  bookValue: "₹571.32",
-  dividendYield: "0.64%",
-  dividendPayout: "12.5%",
-  faceValue: "₹10",
-  
-  // Trading Data  
-  beta: "0.85",
-  avgVolume: "1.28M",
-  yearHigh: "₹4,790",
-  yearLow: "₹3,510",
-}
+// Stock fundamentals for different tickers
+const stockFundamentalsData = {
+  'HDFCBANK.NS': {
+    // Valuation Metrics
+    marketCap: "₹70,860Cr",
+    peRatio: "38.52",
+    pbRatio: "8.25",
+    industryPE: "35.78",
+    enterpriseValue: "₹69,421Cr",
+    evToEBITDA: "28.3",
+    
+    // Performance Metrics
+    roe: "20.88%",
+    roa: "15.24%",
+    roic: "22.15%",
+    operatingMargin: "27.6%",
+    netMargin: "19.3%",
+    
+    // Financial Metrics
+    debtToEquity: "0.02",
+    currentRatio: "3.85",
+    quickRatio: "3.42",
+    interestCoverage: "152.6x",
+    
+    // Per Share Data
+    eps: "₹122.28",
+    bookValue: "₹571.32",
+    dividendYield: "0.64%",
+    dividendPayout: "12.5%",
+    faceValue: "₹10",
+    
+    // Trading Data  
+    beta: "0.85",
+    avgVolume: "1.28M",
+    yearHigh: "₹4,790",
+    yearLow: "₹3,510",
+  },
+  'RELIANCE.NS': {
+    // Valuation Metrics
+    marketCap: "₹380,525Cr",
+    peRatio: "32.15",
+    pbRatio: "4.62",
+    industryPE: "28.96",
+    enterpriseValue: "₹410,325Cr",
+    evToEBITDA: "18.7",
+    
+    // Performance Metrics
+    roe: "16.35%",
+    roa: "9.87%",
+    roic: "15.42%",
+    operatingMargin: "21.8%",
+    netMargin: "12.4%",
+    
+    // Financial Metrics
+    debtToEquity: "0.28",
+    currentRatio: "2.25",
+    quickRatio: "1.98",
+    interestCoverage: "78.3x",
+    
+    // Per Share Data
+    eps: "₹78.56",
+    bookValue: "₹556.48",
+    dividendYield: "0.42%",
+    dividendPayout: "13.8%",
+    faceValue: "₹10",
+    
+    // Trading Data  
+    beta: "1.15",
+    avgVolume: "3.85M",
+    yearHigh: "₹2,620",
+    yearLow: "₹2,180",
+  },
+  'TCS.NS': {
+    // Valuation Metrics
+    marketCap: "₹268,450Cr",
+    peRatio: "29.84",
+    pbRatio: "12.35",
+    industryPE: "26.52",
+    enterpriseValue: "₹262,370Cr",
+    evToEBITDA: "22.1",
+    
+    // Performance Metrics
+    roe: "41.56%",
+    roa: "25.73%",
+    roic: "38.92%",
+    operatingMargin: "25.3%",
+    netMargin: "21.6%",
+    
+    // Financial Metrics
+    debtToEquity: "0.01",
+    currentRatio: "4.32",
+    quickRatio: "4.21",
+    interestCoverage: "356.2x",
+    
+    // Per Share Data
+    eps: "₹112.15",
+    bookValue: "₹272.86",
+    dividendYield: "1.25%",
+    dividendPayout: "36.4%",
+    faceValue: "₹1",
+    
+    // Trading Data  
+    beta: "0.72",
+    avgVolume: "2.15M",
+    yearHigh: "₹3,680",
+    yearLow: "₹3,025",
+  }
+};
 
 // Descriptions for tooltips
 const metricDescriptions = {
@@ -73,15 +145,39 @@ const metricDescriptions = {
 
 // Trends for specific metrics
 const metricTrends = {
-  peRatio: 'up',
-  roe: 'up',
-  debtToEquity: 'down',
-  operatingMargin: 'up',
-  netMargin: 'down',
+  'HDFCBANK.NS': {
+    peRatio: 'up',
+    roe: 'up',
+    debtToEquity: 'down',
+    operatingMargin: 'up',
+    netMargin: 'down',
+  },
+  'RELIANCE.NS': {
+    peRatio: 'up',
+    roe: 'down',
+    debtToEquity: 'up',
+    operatingMargin: 'down',
+    netMargin: 'up',
+  },
+  'TCS.NS': {
+    peRatio: 'down',
+    roe: 'up',
+    debtToEquity: 'down',
+    operatingMargin: 'up',
+    netMargin: 'up',
+  }
+};
+
+interface StockFundamentalsProps {
+  stockSymbol?: string;
 }
 
-const StockFundamentals = () => {
+const StockFundamentals: React.FC<StockFundamentalsProps> = ({ stockSymbol = 'HDFCBANK.NS' }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
+  
+  // Get data for the selected stock
+  const stockFundamentals = stockFundamentalsData[stockSymbol as keyof typeof stockFundamentalsData] || stockFundamentalsData['HDFCBANK.NS'];
+  const trends = metricTrends[stockSymbol as keyof typeof metricTrends] || metricTrends['HDFCBANK.NS'];
 
   return (
     <Card className="glass-panel">
@@ -92,7 +188,7 @@ const StockFundamentals = () => {
             Fundamentals
           </CardTitle>
           <div className="text-sm text-muted-foreground">
-            HDFC Bank Ltd (HDFCBANK.NS)
+            {stockSymbol}
           </div>
         </div>
       </CardHeader>
@@ -110,7 +206,7 @@ const StockFundamentals = () => {
               <FundamentalMetric 
                 label="P/E Ratio (TTM)" 
                 value={stockFundamentals.peRatio} 
-                trend={metricTrends.peRatio as any}
+                trend={trends.peRatio as any}
                 description={metricDescriptions.peRatio}
               />
               <FundamentalMetric 
@@ -135,7 +231,7 @@ const StockFundamentals = () => {
               <FundamentalMetric 
                 label="ROE" 
                 value={stockFundamentals.roe} 
-                trend={metricTrends.roe as any}
+                trend={trends.roe as any}
                 description={metricDescriptions.roe}
               />
               <FundamentalMetric 
@@ -146,13 +242,13 @@ const StockFundamentals = () => {
               <FundamentalMetric 
                 label="Operating Margin" 
                 value={stockFundamentals.operatingMargin} 
-                trend={metricTrends.operatingMargin as any}
+                trend={trends.operatingMargin as any}
                 description={metricDescriptions.operatingMargin}
               />
               <FundamentalMetric 
                 label="Net Margin" 
                 value={stockFundamentals.netMargin} 
-                trend={metricTrends.netMargin as any}
+                trend={trends.netMargin as any}
                 description={metricDescriptions.netMargin}
               />
             </div>
@@ -165,7 +261,7 @@ const StockFundamentals = () => {
               <FundamentalMetric 
                 label="Debt to Equity" 
                 value={stockFundamentals.debtToEquity} 
-                trend={metricTrends.debtToEquity as any}
+                trend={trends.debtToEquity as any}
                 description={metricDescriptions.debtToEquity}
               />
               <FundamentalMetric 
