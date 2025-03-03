@@ -2,7 +2,8 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { ArrowUpRight, ArrowDownRight, DollarSign, TrendingUp, Briefcase } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, DollarSign, TrendingUp, Briefcase, Info } from 'lucide-react';
+import StockFundamentals from '@/components/stock/StockFundamentals';
 
 const Dashboard = () => {
   const [marketData, setMarketData] = useState([
@@ -87,6 +88,9 @@ const Dashboard = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Stock Fundamentals Section */}
+      <StockFundamentals />
     </div>
   );
 };
