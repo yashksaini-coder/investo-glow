@@ -1,10 +1,10 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Info, ChevronDown, TrendingUp, TrendingDown, Briefcase } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import FundamentalMetric from './FundamentalMetric';
+import FundamentalsInfoDialog from './FundamentalsInfoDialog';
 
 // Enhanced data for stock fundamentals
 const stockFundamentals = {
@@ -81,6 +81,8 @@ const metricTrends = {
 }
 
 const StockFundamentals = () => {
+  const [dialogOpen, setDialogOpen] = useState(false);
+
   return (
     <Card className="glass-panel">
       <CardHeader>
@@ -215,22 +217,22 @@ const StockFundamentals = () => {
         </div>
         
         <div className="mt-6 flex items-center justify-center">
-          <Button variant="ghost" size="sm" className="text-sm flex items-center">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-sm flex items-center"
+            onClick={() => setDialogOpen(true)}
+          >
             <span>Understand Fundamentals</span>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Info className="ml-1 h-4 w-4" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="max-w-xs text-xs">
-                    These financial metrics help you assess the company's financial health, performance, and valuation relative to its peers.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Info className="ml-1 h-4 w-4" />
           </Button>
         </div>
+
+        {/* Fundamentals Info Dialog */}
+        <FundamentalsInfoDialog 
+          open={dialogOpen} 
+          onOpenChange={setDialogOpen} 
+        />
       </CardContent>
     </Card>
   );

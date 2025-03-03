@@ -21,8 +21,8 @@ const FundamentalMetric = ({ label, value, trend, description }: FundamentalMetr
               <TooltipTrigger asChild>
                 <HelpCircle className="h-3 w-3 text-muted-foreground opacity-70 cursor-help" />
               </TooltipTrigger>
-              <TooltipContent side="right">
-                <p className="max-w-xs text-xs">{description}</p>
+              <TooltipContent side="right" className="max-w-[220px]">
+                <p className="text-xs">{description}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
