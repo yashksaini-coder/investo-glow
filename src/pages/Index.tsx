@@ -215,22 +215,6 @@ const Index = () => {
           )}
         </Card>
       </div>
-
-      {/* Call to Action */}
-      <Card className="glass-panel text-center p-8 mb-12">
-        <h2 className="text-2xl font-bold mb-4">Start Your Investment Journey Today</h2>
-        <p className="text-muted-foreground mb-6">
-          Join thousands of investors making smarter decisions with InvestoGlow
-        </p>
-        <div className="flex justify-center gap-4">
-          <Link to="/register">
-            <Button className="hover-effect" size="lg">
-              Get Started
-              <TrendingUp className="ml-2 h-4 w-4" />
-            </Button>
-          </Link>
-        </div>
-      </Card>
     </div>
   );
 };
