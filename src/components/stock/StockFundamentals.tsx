@@ -49,9 +49,11 @@ const formatNumber = (num: number): string => {
   }
 };
 
+const stock_url = import.meta.env.VITE_PUBLIC_SERVER_URL;
 // Fetch stock fundamentals data
 const fetchStockAnalysis = async (symbol: string): Promise<StockAnalysis> => {
-  const response = await fetch(`https://investo-server-dlii.onrender.com/stock-analysis/${symbol.split('.')[0].toLowerCase()}`);
+  const response = await fetch(`${stock_url}stock-analysis/${symbol.toLowerCase()}`);
+  
   if (!response.ok) {
     throw new Error('Failed to fetch stock analysis');
   }

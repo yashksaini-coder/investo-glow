@@ -4,13 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Star } from 'lucide-react';
 
-
-// Define metadata for the page
-export const metadata = {
-  title: 'Market - InvestoGlow',
-  description: 'View and track real-time market data and stock prices',
-};
-
 interface StockData {
   symbol: string;
   name: string;

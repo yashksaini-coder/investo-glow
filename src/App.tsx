@@ -23,6 +23,12 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
 
+// Define metadata for the page
+export const metadata = {
+  title: 'Investo Glow',
+  description: 'View and track real-time market data and stock prices',
+};
+
 const App = () => (
 
     <QueryClientProvider client={queryClient}>

@@ -19,11 +19,15 @@ const stockOptions = [
   { id: 'META', name: 'Meta Platforms Inc.' },
   { id: 'NVDA', name: 'NVIDIA Corporation' },
   { id: 'TSLA', name: 'Tesla Inc.' },
+  { id: 'PYPL', name: 'PayPal Holdings Inc.' },
+  { id: 'NFLX', name: 'Netflix Inc.' },
 ];
+
+const stock_url = import.meta.env.VITE_PUBLIC_SERVER_URL;
 
 // Fetch basic stock info
 const fetchStockInfo = async (symbol: string): Promise<BasicStockInfo> => {
-  const response = await fetch(`https://investo-server-dlii.onrender.com/stock/${symbol.toLowerCase()}`);
+  const response = await fetch(`${stock_url}stock/${symbol.toLowerCase()}`);
   if (!response.ok) {
     throw new Error('Failed to fetch stock info');
   }
@@ -307,52 +311,9 @@ const Dashboard = () => {
           </Button>
         </div>
       </div>
-
-      <div className="grid gap-6 md:grid-cols-3">
-        <Card className="glass-panel">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">
-              Portfolio Value
-            </CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(parseFloat(portfolioValue))}</div>
-            <p className="text-xs text-muted-foreground">
-              {portfolioChange} from last day
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="glass-panel">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">
-              Active Positions
-            </CardTitle>
-            <Briefcase className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{activePositions}</div>
-            <p className="text-xs text-muted-foreground">
-              {newPositions} new positions today
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="glass-panel">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">
-              Market Trend
-            </CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{marketTrend.trend}</div>
-            <p className="text-xs text-muted-foreground">
-              {marketTrend.description}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
+            
+      {/* Stock Summary Section */}
+      
       <Card className="glass-panel">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>{stockInfo?.name} Performance</CardTitle>
