@@ -1,119 +1,12 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Info, ChevronDown, TrendingUp, TrendingDown, Briefcase } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Info, Briefcase } from 'lucide-react';
 import FundamentalMetric from './FundamentalMetric';
 import FundamentalsInfoDialog from './FundamentalsInfoDialog';
-
-// Stock fundamentals for different tickers
-const stockFundamentalsData = {
-  'HDFCBANK.NS': {
-    // Valuation Metrics
-    marketCap: "₹70,860Cr",
-    peRatio: "38.52",
-    pbRatio: "8.25",
-    industryPE: "35.78",
-    enterpriseValue: "₹69,421Cr",
-    evToEBITDA: "28.3",
-    
-    // Performance Metrics
-    roe: "20.88%",
-    roa: "15.24%",
-    roic: "22.15%",
-    operatingMargin: "27.6%",
-    netMargin: "19.3%",
-    
-    // Financial Metrics
-    debtToEquity: "0.02",
-    currentRatio: "3.85",
-    quickRatio: "3.42",
-    interestCoverage: "152.6x",
-    
-    // Per Share Data
-    eps: "₹122.28",
-    bookValue: "₹571.32",
-    dividendYield: "0.64%",
-    dividendPayout: "12.5%",
-    faceValue: "₹10",
-    
-    // Trading Data  
-    beta: "0.85",
-    avgVolume: "1.28M",
-    yearHigh: "₹4,790",
-    yearLow: "₹3,510",
-  },
-  'RELIANCE.NS': {
-    // Valuation Metrics
-    marketCap: "₹380,525Cr",
-    peRatio: "32.15",
-    pbRatio: "4.62",
-    industryPE: "28.96",
-    enterpriseValue: "₹410,325Cr",
-    evToEBITDA: "18.7",
-    
-    // Performance Metrics
-    roe: "16.35%",
-    roa: "9.87%",
-    roic: "15.42%",
-    operatingMargin: "21.8%",
-    netMargin: "12.4%",
-    
-    // Financial Metrics
-    debtToEquity: "0.28",
-    currentRatio: "2.25",
-    quickRatio: "1.98",
-    interestCoverage: "78.3x",
-    
-    // Per Share Data
-    eps: "₹78.56",
-    bookValue: "₹556.48",
-    dividendYield: "0.42%",
-    dividendPayout: "13.8%",
-    faceValue: "₹10",
-    
-    // Trading Data  
-    beta: "1.15",
-    avgVolume: "3.85M",
-    yearHigh: "₹2,620",
-    yearLow: "₹2,180",
-  },
-  'TCS.NS': {
-    // Valuation Metrics
-    marketCap: "₹268,450Cr",
-    peRatio: "29.84",
-    pbRatio: "12.35",
-    industryPE: "26.52",
-    enterpriseValue: "₹262,370Cr",
-    evToEBITDA: "22.1",
-    
-    // Performance Metrics
-    roe: "41.56%",
-    roa: "25.73%",
-    roic: "38.92%",
-    operatingMargin: "25.3%",
-    netMargin: "21.6%",
-    
-    // Financial Metrics
-    debtToEquity: "0.01",
-    currentRatio: "4.32",
-    quickRatio: "4.21",
-    interestCoverage: "356.2x",
-    
-    // Per Share Data
-    eps: "₹112.15",
-    bookValue: "₹272.86",
-    dividendYield: "1.25%",
-    dividendPayout: "36.4%",
-    faceValue: "₹1",
-    
-    // Trading Data  
-    beta: "0.72",
-    avgVolume: "2.15M",
-    yearHigh: "₹3,680",
-    yearLow: "₹3,025",
-  }
-};
+import { useQuery } from '@tanstack/react-query';
+import { StockAnalysis } from '@/lib/types';
 
 // Descriptions for tooltips
 const metricDescriptions = {
@@ -121,7 +14,6 @@ const metricDescriptions = {
   peRatio: "Price to Earnings ratio - measures company valuation relative to its earnings",
   pbRatio: "Price to Book ratio - compares market value to book value",
   industryPE: "Average P/E ratio for the industry",
-  enterpriseValue: "Total company value (market cap + debt - cash)",
   evToEBITDA: "Enterprise Value to EBITDA - valuation multiple",
   roe: "Return on Equity - measures profitability relative to shareholder equity",
   roa: "Return on Assets - measures profitability relative to total assets",
@@ -135,7 +27,6 @@ const metricDescriptions = {
   eps: "Earnings Per Share - profit allocated to each share",
   bookValue: "Net asset value per share",
   dividendYield: "Annual dividend per share divided by share price",
-  dividendPayout: "Percentage of earnings paid as dividends",
   faceValue: "Original cost of the stock shown on certificate",
   beta: "Measure of volatility compared to the market",
   avgVolume: "Average daily trading volume",
@@ -143,41 +34,106 @@ const metricDescriptions = {
   yearLow: "Lowest price in the last 52 weeks",
 }
 
-// Trends for specific metrics
-const metricTrends = {
-  'HDFCBANK.NS': {
-    peRatio: 'up',
-    roe: 'up',
-    debtToEquity: 'down',
-    operatingMargin: 'up',
-    netMargin: 'down',
-  },
-  'RELIANCE.NS': {
-    peRatio: 'up',
-    roe: 'down',
-    debtToEquity: 'up',
-    operatingMargin: 'down',
-    netMargin: 'up',
-  },
-  'TCS.NS': {
-    peRatio: 'down',
-    roe: 'up',
-    debtToEquity: 'down',
-    operatingMargin: 'up',
-    netMargin: 'up',
+// Format large numbers with appropriate suffixes
+const formatNumber = (num: number): string => {
+  if (num >= 1000000000000) {
+    return `₹${(num / 1000000000000).toFixed(2)}T`;
+  } else if (num >= 1000000000) {
+    return `₹${(num / 1000000000).toFixed(2)}B`;
+  } else if (num >= 1000000) {
+    return `₹${(num / 1000000).toFixed(2)}M`;
+  } else if (num >= 1000) {
+    return `₹${(num / 1000).toFixed(2)}K`;
+  } else {
+    return `₹${num.toFixed(2)}`;
   }
+};
+
+// Fetch stock fundamentals data
+const fetchStockAnalysis = async (symbol: string): Promise<StockAnalysis> => {
+  const response = await fetch(`https://investo-server-dlii.onrender.com/stock-analysis/${symbol.split('.')[0].toLowerCase()}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch stock analysis');
+  }
+  return response.json();
 };
 
 interface StockFundamentalsProps {
   stockSymbol?: string;
 }
 
-const StockFundamentals: React.FC<StockFundamentalsProps> = ({ stockSymbol = 'HDFCBANK.NS' }) => {
+const StockFundamentals: React.FC<StockFundamentalsProps> = ({ stockSymbol = 'MSFT' }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   
-  // Get data for the selected stock
-  const stockFundamentals = stockFundamentalsData[stockSymbol as keyof typeof stockFundamentalsData] || stockFundamentalsData['HDFCBANK.NS'];
-  const trends = metricTrends[stockSymbol as keyof typeof metricTrends] || metricTrends['HDFCBANK.NS'];
+  // Remove the .NS extension if it exists
+  const tickerSymbol = stockSymbol.split('.')[0];
+  
+  const { data: stockAnalysis, isLoading, error } = useQuery({
+    queryKey: ['stockAnalysis', tickerSymbol],
+    queryFn: () => fetchStockAnalysis(tickerSymbol),
+    refetchOnWindowFocus: false,
+    staleTime: 300000, // 5 minutes
+  });
+
+  if (isLoading) {
+    return (
+      <Card className="glass-panel">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Briefcase className="h-5 w-5" />
+            Loading Fundamentals...
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[400px] flex items-center justify-center">
+            <div className="animate-pulse space-y-4 w-full">
+              {[1, 2, 3, 4, 5, 6].map((item) => (
+                <div key={item} className="h-4 bg-gray-300/20 rounded w-full"></div>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="glass-panel">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-red-500">
+            <Briefcase className="h-5 w-5" />
+            Error Loading Fundamentals
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <p>Failed to load stock fundamentals. Please try again later.</p>
+            <Button 
+              variant="outline" 
+              className="mt-4"
+              onClick={() => window.location.reload()}
+            >
+              Retry
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!stockAnalysis) {
+    return null;
+  }
+
+  // Determine trends for certain metrics (you would ideally get this from historical data)
+  const trends = {
+    peRatio: stockAnalysis.financial_ratios.pe_ratio > 30 ? 'up' : 'down',
+    roe: stockAnalysis.financial_ratios.roe > 25 ? 'up' : 'down',
+    debtToEquity: stockAnalysis.financial_health.debt_to_equity < 1 ? 'down' : 'up',
+    operatingMargin: stockAnalysis.financial_ratios.operating_margin > 30 ? 'up' : 'down',
+    netMargin: stockAnalysis.financial_ratios.net_margin > 20 ? 'up' : 'down',
+  };
 
   return (
     <Card className="glass-panel">
@@ -188,7 +144,7 @@ const StockFundamentals: React.FC<StockFundamentalsProps> = ({ stockSymbol = 'HD
             Fundamentals
           </CardTitle>
           <div className="text-sm text-muted-foreground">
-            {stockSymbol}
+            {stockAnalysis.symbol}
           </div>
         </div>
       </CardHeader>
@@ -200,28 +156,23 @@ const StockFundamentals: React.FC<StockFundamentalsProps> = ({ stockSymbol = 'HD
             <div className="space-y-1">
               <FundamentalMetric 
                 label="Market Cap" 
-                value={stockFundamentals.marketCap} 
+                value={formatNumber(stockAnalysis.market_cap)} 
                 description={metricDescriptions.marketCap}
               />
               <FundamentalMetric 
                 label="P/E Ratio (TTM)" 
-                value={stockFundamentals.peRatio} 
+                value={stockAnalysis.financial_ratios.pe_ratio.toFixed(2)} 
                 trend={trends.peRatio as any}
                 description={metricDescriptions.peRatio}
               />
               <FundamentalMetric 
-                label="Industry P/E" 
-                value={stockFundamentals.industryPE} 
-                description={metricDescriptions.industryPE}
-              />
-              <FundamentalMetric 
                 label="P/B Ratio" 
-                value={stockFundamentals.pbRatio} 
+                value={stockAnalysis.financial_ratios.pb_ratio.toFixed(2)} 
                 description={metricDescriptions.pbRatio}
               />
               <FundamentalMetric 
                 label="EV/EBITDA" 
-                value={stockFundamentals.evToEBITDA} 
+                value={stockAnalysis.financial_ratios.ev_ebitda.toFixed(2)} 
                 description={metricDescriptions.evToEBITDA}
               />
             </div>
@@ -230,24 +181,24 @@ const StockFundamentals: React.FC<StockFundamentalsProps> = ({ stockSymbol = 'HD
             <div className="space-y-1">
               <FundamentalMetric 
                 label="ROE" 
-                value={stockFundamentals.roe} 
+                value={`${stockAnalysis.financial_ratios.roe.toFixed(2)}%`} 
                 trend={trends.roe as any}
                 description={metricDescriptions.roe}
               />
               <FundamentalMetric 
                 label="ROA" 
-                value={stockFundamentals.roa} 
+                value={`${stockAnalysis.financial_ratios.roa.toFixed(2)}%`} 
                 description={metricDescriptions.roa}
               />
               <FundamentalMetric 
                 label="Operating Margin" 
-                value={stockFundamentals.operatingMargin} 
+                value={`${stockAnalysis.financial_ratios.operating_margin.toFixed(2)}%`} 
                 trend={trends.operatingMargin as any}
                 description={metricDescriptions.operatingMargin}
               />
               <FundamentalMetric 
                 label="Net Margin" 
-                value={stockFundamentals.netMargin} 
+                value={`${stockAnalysis.financial_ratios.net_margin.toFixed(2)}%`} 
                 trend={trends.netMargin as any}
                 description={metricDescriptions.netMargin}
               />
@@ -260,23 +211,23 @@ const StockFundamentals: React.FC<StockFundamentalsProps> = ({ stockSymbol = 'HD
             <div className="space-y-1">
               <FundamentalMetric 
                 label="Debt to Equity" 
-                value={stockFundamentals.debtToEquity} 
+                value={stockAnalysis.financial_health.debt_to_equity.toFixed(2)} 
                 trend={trends.debtToEquity as any}
                 description={metricDescriptions.debtToEquity}
               />
               <FundamentalMetric 
                 label="Current Ratio" 
-                value={stockFundamentals.currentRatio} 
+                value={stockAnalysis.financial_health.current_ratio.toFixed(2)} 
                 description={metricDescriptions.currentRatio}
               />
               <FundamentalMetric 
                 label="Quick Ratio" 
-                value={stockFundamentals.quickRatio} 
+                value={stockAnalysis.financial_health.quick_ratio.toFixed(2)} 
                 description={metricDescriptions.quickRatio}
               />
               <FundamentalMetric 
                 label="Interest Coverage" 
-                value={stockFundamentals.interestCoverage} 
+                value={`${stockAnalysis.financial_health.interest_coverage.toFixed(2)}x`} 
                 description={metricDescriptions.interestCoverage}
               />
             </div>
@@ -285,27 +236,27 @@ const StockFundamentals: React.FC<StockFundamentalsProps> = ({ stockSymbol = 'HD
             <div className="space-y-1">
               <FundamentalMetric 
                 label="EPS (TTM)" 
-                value={stockFundamentals.eps} 
+                value={`$${stockAnalysis.per_share_metrics.eps.toFixed(2)}`} 
                 description={metricDescriptions.eps}
               />
               <FundamentalMetric 
                 label="Book Value" 
-                value={stockFundamentals.bookValue} 
+                value={`$${stockAnalysis.per_share_metrics.book_value.toFixed(2)}`} 
                 description={metricDescriptions.bookValue}
               />
               <FundamentalMetric 
                 label="Dividend Yield" 
-                value={stockFundamentals.dividendYield} 
+                value={`${stockAnalysis.per_share_metrics.dividend_yield.toFixed(2)}%`} 
                 description={metricDescriptions.dividendYield}
               />
               <FundamentalMetric 
                 label="52-Week High" 
-                value={stockFundamentals.yearHigh} 
+                value={`$${stockAnalysis.per_share_metrics.fifty_two_week_high.toFixed(2)}`} 
                 description={metricDescriptions.yearHigh}
               />
               <FundamentalMetric 
                 label="52-Week Low" 
-                value={stockFundamentals.yearLow} 
+                value={`$${stockAnalysis.per_share_metrics.fifty_two_week_low.toFixed(2)}`} 
                 description={metricDescriptions.yearLow}
               />
             </div>
