@@ -3,19 +3,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { MessageSquare, Send, Bot, ChevronDown } from 'lucide-react';
+import { MessageSquare, Send, Bot, ChevronDown, BotIcon } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { 
+import { AssistantType, Message } from '@/lib/types';
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-type AssistantType = 'general' | 'financial';
-type Message = { query: string; response: string };
+import Markdown from 'react-markdown'
+// import remarkGfm from 'remark-gfm';
 
 const presetPrompts = [
   "What's the current market sentiment for Bitcoin?",
@@ -54,10 +54,10 @@ const Chat = () => {
 
   const callChatAPI = async (prompt: string): Promise<string> => {
     try {
-      const endpoint = assistantType === 'general' 
+      const endpoint = assistantType === 'general'
         ? `${server_url}chat`
         : `${server_url}agent`;
-      
+
       const response = await fetch(`${endpoint}?query=${encodeURIComponent(prompt)}`, {
         method: 'GET',
         headers: {
@@ -70,7 +70,7 @@ const Chat = () => {
       }
 
       const data = await response.json();
-      
+
       // Handle the case where response is in {question, answer} format
       if (data.answer) {
         return data.answer;
@@ -87,12 +87,12 @@ const Chat = () => {
       else if (data.response === "error") {
         return "Couldn't parse the response. Please try again.";
       }
-      
+
       return "Sorry, I couldn't process your request.";
     } catch (error) {
       console.error('API Error:', error);
-      return error instanceof Error 
-        ? `Error: ${error.message}` 
+      return error instanceof Error
+        ? `Error: ${error.message}`
         : "An unexpected error occurred. Please try again.";
     }
   };
@@ -105,10 +105,10 @@ const Chat = () => {
       // Add user message immediately for better UX
       setMessages(prevMessages => [...prevMessages, { query: promptText.trim(), response: "..." }]);
       setQuery('');
-      
+
       // Call the appropriate API based on selected assistant type
       const aiResponse = await callChatAPI(promptText.trim());
-      
+
       // Update messages with the actual response (replacing the "...")
       setMessages(prevMessages => {
         const newMessages = [...prevMessages];
@@ -135,7 +135,7 @@ const Chat = () => {
         ]);
 
       if (error) throw error;
-      
+
       // Scroll to the bottom of the messages
       setTimeout(scrollToBottom, 100);
     } catch (error) {
@@ -161,49 +161,42 @@ const Chat = () => {
 
   return (
     <div className="container max-w-4xl mx-auto py-8">
-      <Card className="glass-panel mb-6">
+      <Card className="glass-panel">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Bot className="h-6 w-6" />
-            AI Investment Assistant
-          </CardTitle>
+          <div className="flex flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <Bot className="h-6 w-6 text-primary" />
+              <CardTitle>AI Investment Assistant</CardTitle>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Assistant Type:</span>
+              <Select value={assistantType} onValueChange={handleAssistantChange}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select Assistant" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="general">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="h-4 w-6" />
+                AI Assistant
+              </div>
+            </SelectItem>
+            <SelectItem value="financial">
+              <div className="flex items-center gap-2">
+                <BotIcon className="h-4 w-4" />
+                Financial Analyst
+              </div>
+            </SelectItem>
+          </SelectContent>
+              </Select>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground mb-4">
             Ask me anything about cryptocurrency, market analysis, or investment strategies.
           </p>
-          
-          <div className="flex flex-wrap gap-2 mb-6">
-            {presetPrompts.map((prompt, index) => (
-              <Button
-                key={index}
-                variant="secondary"
-                size="sm"
-                onClick={() => handleSubmit(prompt)}
-                disabled={loading}
-              >
-                {prompt}
-              </Button>
-            ))}
-          </div>
 
-          <div className="flex items-center gap-2 mb-2">
-            <div className="text-sm font-medium">Currently using:</div>
-            <Select value={assistantType} onValueChange={handleAssistantChange}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select Assistant" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="general">General Assistant</SelectItem>
-                <SelectItem value="financial">Financial Analyst</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="glass-panel">
-        <CardContent className="p-4">
           <div className="h-[500px] overflow-y-auto mb-4 space-y-4 pr-2">
             {messages.length === 0 ? (
               <div className="text-center text-muted-foreground p-8">
@@ -226,7 +219,7 @@ const Chat = () => {
                           <span className="animate-pulse delay-300">.</span>
                         </span>
                       ) : (
-                        msg.response
+                        <Markdown>{msg.response}</Markdown>
                       )}
                     </p>
                   </div>
@@ -235,12 +228,12 @@ const Chat = () => {
             )}
             <div ref={messagesEndRef} />
           </div>
-          
-          <form 
+
+          <form
             onSubmit={(e) => {
               e.preventDefault();
               handleSubmit(query);
-            }} 
+            }}
             className="flex gap-2"
           >
             <Input
@@ -253,8 +246,8 @@ const Chat = () => {
               className="flex-1"
             />
             <div className="flex-shrink-0 relative">
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={loading}
                 className="relative"
               >
