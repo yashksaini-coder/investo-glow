@@ -1,3 +1,4 @@
+
 import { Suspense, lazy } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -5,15 +6,15 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, RequireAuth } from "@/contexts/AuthContext";
-import { WatchlistProvider } from "@/contexts/WatchlistContext"; // Import the new WatchlistProvider
+import { WatchlistProvider } from "@/contexts/WatchlistContext";
 import Layout from "./components/layout/Layout";
-// import ErrorBoundary from "./components/ErrorBoundary";
-// import LoadingSpinner from "./components/LoadingSpinner";
 
 const Index = lazy(() => import("./pages/Index"));
 const About = lazy(() => import("./pages/About"));
 const Login = lazy(() => import("./pages/auth/Login"));
 const Register = lazy(() => import("./pages/auth/Register"));
+const ForgotPassword = lazy(() => import("./pages/auth/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/auth/ResetPassword"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Market = lazy(() => import("./pages/Market"));
 const Profile = lazy(() => import("./pages/Profile"));
@@ -32,7 +33,7 @@ const App = () => (
 
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <WatchlistProvider> {/* Add the WatchlistProvider here */}
+        <WatchlistProvider>
           <TooltipProvider>
             <Toaster />
             <Sonner />
@@ -44,6 +45,8 @@ const App = () => (
                     <Route path="/about" element={<About />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
                     <Route 
                       path="/dashboard" 
                       element={
