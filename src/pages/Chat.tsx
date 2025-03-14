@@ -1,4 +1,3 @@
-
 import { useState, useRef, KeyboardEvent } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -36,6 +35,8 @@ const Chat = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const server_url = import.meta.env.VITE_PUBLIC_SERVER_URL;
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -54,15 +55,14 @@ const Chat = () => {
   const callChatAPI = async (prompt: string): Promise<string> => {
     try {
       const endpoint = assistantType === 'general' 
-        ? 'https://investo-server-dlii.onrender.com/chat'
-        : 'https://investo-server-dlii.onrender.com/agent';
+        ? `${server_url}chat`
+        : `${server_url}agent`;
       
-      const response = await fetch(endpoint, {
-        method: 'POST',
+      const response = await fetch(`${endpoint}?query=${encodeURIComponent(prompt)}`, {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ query: prompt }),
       });
 
       if (!response.ok) {
@@ -70,10 +70,30 @@ const Chat = () => {
       }
 
       const data = await response.json();
-      return data.response || "Sorry, I couldn't process your request.";
+      
+      // Handle the case where response is in {question, answer} format
+      if (data.answer) {
+        return data.answer;
+      }
+      // Handle the case where response is in {response} format
+      else if (data.response) {
+        return data.response;
+      }
+      // Fallback for unknown formats - try to get any string content
+      else if (typeof data === 'object') {
+        return JSON.stringify(data);
+      }
+
+      else if (data.response === "error") {
+        return "Couldn't parse the response. Please try again.";
+      }
+      
+      return "Sorry, I couldn't process your request.";
     } catch (error) {
       console.error('API Error:', error);
-      return "Sorry, there was an error connecting to the assistant. Please try again later.";
+      return error instanceof Error 
+        ? `Error: ${error.message}` 
+        : "An unexpected error occurred. Please try again.";
     }
   };
 
@@ -83,16 +103,24 @@ const Chat = () => {
     setLoading(true);
     try {
       // Add user message immediately for better UX
-      const updatedMessages = [...messages, { query: promptText.trim(), response: "..." }];
-      setMessages(updatedMessages);
+      setMessages(prevMessages => [...prevMessages, { query: promptText.trim(), response: "..." }]);
       setQuery('');
       
       // Call the appropriate API based on selected assistant type
       const aiResponse = await callChatAPI(promptText.trim());
-
-      // Update the "..." with the actual response
-      const finalMessages = [...messages, { query: promptText.trim(), response: aiResponse }];
-      setMessages(finalMessages);
+      
+      // Update messages with the actual response (replacing the "...")
+      setMessages(prevMessages => {
+        const newMessages = [...prevMessages];
+        // Replace the last message's response
+        if (newMessages.length > 0) {
+          newMessages[newMessages.length - 1] = {
+            query: promptText.trim(),
+            response: aiResponse
+          };
+        }
+        return newMessages;
+      });
 
       // Store the interaction in the database
       const { error } = await supabase
@@ -117,8 +145,13 @@ const Chat = () => {
         title: "Error",
         description: "Failed to process your request. Please try again."
       });
-      // Remove the "..." message if there was an error
-      setMessages(messages);
+      // Remove the last message with "..." if there was an error
+      setMessages(prevMessages => {
+        if (prevMessages.length > 0 && prevMessages[prevMessages.length - 1].response === "...") {
+          return prevMessages.slice(0, -1);
+        }
+        return prevMessages;
+      });
     } finally {
       setLoading(false);
       // Focus back on the input field
