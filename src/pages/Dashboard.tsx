@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
@@ -122,6 +121,7 @@ const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredStocks, setFilteredStocks] = useState(stockOptions);
   const [showResults, setShowResults] = useState(false);
+  const [customTicker, setCustomTicker] = useState('');
   const { toast } = useToast();
   
   // Query for stock information
@@ -155,6 +155,7 @@ const Dashboard = () => {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
+    setCustomTicker(query);
     
     if (query.trim() === '') {
       setFilteredStocks(stockOptions);
@@ -172,9 +173,35 @@ const Dashboard = () => {
   // Handle stock selection
   const handleSelectStock = (stockId: string) => {
     setSelectedStock(stockId);
-    setSearchQuery(stockOptions.find(s => s.id === stockId)?.name || '');
+    setSearchQuery(stockOptions.find(s => s.id === stockId)?.name || stockId);
     setShowResults(false);
     refetchStockInfo();
+  };
+
+  // Handle custom stock search
+  const handleSearch = () => {
+    // If the search query matches one of our predefined options, use that
+    const matchedStock = stockOptions.find(
+      s => s.id.toLowerCase() === searchQuery.toLowerCase() || 
+           s.name.toLowerCase() === searchQuery.toLowerCase()
+    );
+    
+    if (matchedStock) {
+      handleSelectStock(matchedStock.id);
+    } else if (customTicker.trim() !== '') {
+      // Otherwise use the custom ticker (could be any valid stock symbol)
+      const ticker = customTicker.trim().toUpperCase();
+      setSelectedStock(ticker);
+      refetchStockInfo();
+      setShowResults(false);
+    }
+  };
+
+  // Handle pressing Enter in the search box
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
   };
 
   // Calculate price change for display
@@ -257,6 +284,7 @@ const Dashboard = () => {
               placeholder="Search stocks..."
               value={searchQuery}
               onChange={handleSearchChange}
+              onKeyPress={handleKeyPress}
               className="pl-9 w-full"
             />
             {showResults && filteredStocks.length > 0 && (
@@ -274,7 +302,7 @@ const Dashboard = () => {
               </div>
             )}
           </div>
-          <Button onClick={() => handleSelectStock(selectedStock)}>
+          <Button onClick={handleSearch}>
             Search
           </Button>
         </div>
