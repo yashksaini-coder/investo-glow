@@ -11,6 +11,7 @@ export type Database = {
     Tables: {
       ai_queries: {
         Row: {
+          assistant_type: string
           created_at: string
           id: string
           query: string
@@ -18,6 +19,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          assistant_type?: string
           created_at?: string
           id?: string
           query: string
@@ -25,6 +27,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          assistant_type?: string
           created_at?: string
           id?: string
           query?: string

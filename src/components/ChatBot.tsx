@@ -31,7 +31,8 @@ const ChatBot = () => {
           {
             user_id: user.id,
             query: query.trim(),
-            response: mockResponse
+            response: mockResponse,
+            assistant_type: 'general' // Default to general assistant type
           }
         ]);
 
