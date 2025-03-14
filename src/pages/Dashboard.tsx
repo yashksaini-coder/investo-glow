@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
-import { ArrowUpRight, ArrowDownRight, DollarSign, TrendingUp, Briefcase, Search, AlertTriangle } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, Search, AlertTriangle } from 'lucide-react';
 import StockFundamentals from '@/components/stock/StockFundamentals';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useQuery } from '@tanstack/react-query';
@@ -44,83 +43,28 @@ const generateMockPriceData = (stockInfo: BasicStockInfo, timeframe: string): St
   const now = new Date();
   let dataPoints: StockData[] = [];
   
-  if (timeframe === 'daily') {
-    // Generate hourly data for the last day
-    for (let i = 0; i < 8; i++) {
-      const date = new Date(now);
-      date.setHours(9 + i);
-      date.setMinutes(0);
-      date.setSeconds(0);
-      
-      // Price trends upwards or downwards based on the actual daily change
-      const progress = i / 7; // 0 to 1 as the day progresses
-      const randomFactor = (Math.random() - 0.5) * volatility;
-      const price = previousClose + (priceDiff * progress) + randomFactor;
-      
-      dataPoints.push({
-        date: date.toISOString(),
-        price: Number(price.toFixed(2)),
-        volume: Math.floor(100000 + Math.random() * 900000)
-      });
-    }
-  } else if (timeframe === 'weekly') {
-    // Generate daily data for the last week
-    for (let i = 0; i < 5; i++) {
-      const date = new Date(now);
-      date.setDate(date.getDate() - (4 - i));
-      
-      const progress = i / 4;
-      const randomFactor = (Math.random() - 0.5) * volatility * 2;
-      const price = previousClose * 0.98 + (priceDiff * 5 * progress) + randomFactor;
-      
-      dataPoints.push({
-        date: date.toISOString(),
-        price: Number(price.toFixed(2)),
-        volume: Math.floor(500000 + Math.random() * 1500000)
-      });
-    }
-  } else if (timeframe === 'monthly') {
-    // Generate weekly data for the last month
-    for (let i = 0; i < 4; i++) {
-      const date = new Date(now);
-      date.setDate(date.getDate() - (21 - (i * 7)));
-      
-      const progress = i / 3;
-      const randomFactor = (Math.random() - 0.5) * volatility * 3;
-      const price = previousClose * 0.95 + (priceDiff * 20 * progress) + randomFactor;
-      
-      dataPoints.push({
-        date: date.toISOString(),
-        price: Number(price.toFixed(2)),
-        volume: Math.floor(2000000 + Math.random() * 3000000)
-      });
-    }
+  // Generate hourly data for the last day
+  for (let i = 0; i < 8; i++) {
+    const date = new Date(now);
+    date.setHours(9 + i);
+    date.setMinutes(0);
+    date.setSeconds(0);
+    
+    // Price trends upwards or downwards based on the actual daily change
+    const progress = i / 7; // 0 to 1 as the day progresses
+    const randomFactor = (Math.random() - 0.5) * volatility;
+    const price = previousClose + (priceDiff * progress) + randomFactor;
+    
+    dataPoints.push({
+      date: date.toISOString(),
+      price: Number(price.toFixed(2)),
+      volume: Math.floor(100000 + Math.random() * 900000)
+    });
   }
-  
   return dataPoints;
 };
 
-// Get market trend description based on price change percentage
-const getMarketTrend = (changePercent: number) => {
-  if (changePercent > 2) return { trend: 'Bullish', description: 'Strong upward momentum' };
-  if (changePercent > 0.5) return { trend: 'Bullish', description: 'Positive market sentiment' };
-  if (changePercent > -0.5) return { trend: 'Neutral', description: 'Market consolidating' };
-  if (changePercent > -2) return { trend: 'Bearish', description: 'Cautious market sentiment' };
-  return { trend: 'Bearish', description: 'Strong downward pressure' };
-};
-
-// Format currency values
-const formatCurrency = (value: number): string => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  }).format(value);
-};
-
 const Dashboard = () => {
-  const [activeTimeframe, setActiveTimeframe] = useState('daily');
   const [selectedStock, setSelectedStock] = useState('MSFT');
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredStocks, setFilteredStocks] = useState(stockOptions);
@@ -141,8 +85,8 @@ const Dashboard = () => {
     refetchOnWindowFocus: false,
   });
   
-  // Generate chart data based on stock info
-  const chartData = stockInfo ? generateMockPriceData(stockInfo, activeTimeframe) : [];
+  // Generate chart data based on stock info - using 'daily' as fixed timeframe
+  const chartData = stockInfo ? generateMockPriceData(stockInfo, 'daily') : [];
   
   // Handle errors
   useEffect(() => {
@@ -226,19 +170,6 @@ const Dashboard = () => {
 
   const priceChange = calculateChange();
   
-  // Get market trend based on price change
-  const marketTrend = stockInfo ? getMarketTrend(parseFloat(priceChange.percentChange)) : { trend: 'Neutral', description: 'Market consolidating' };
-  
-  // Mock portfolio data (would come from a real API in production)
-  const portfolioValue = stockInfo ? (stockInfo.currentPrice * 10).toFixed(2) : '0.00'; // Mocking 10 shares
-  const portfolioChange = priceChange.isPositive ? 
-    `+${(parseFloat(priceChange.percentChange) * 1.2).toFixed(2)}%` : 
-    `${(parseFloat(priceChange.percentChange) * 1.2).toFixed(2)}%`;
-  
-  // Mock positions data
-  const activePositions = stockInfo ? Math.floor(Math.random() * 15) + 5 : 0;
-  const newPositions = stockInfo ? Math.floor(Math.random() * 3) : 0;
-
   if (isStockInfoLoading) {
     return (
       <div className="py-8 space-y-8">
@@ -328,127 +259,41 @@ const Dashboard = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="daily" className="w-full" onValueChange={setActiveTimeframe}>
-            <TabsList className="mb-4">
-              <TabsTrigger value="daily">Daily</TabsTrigger>
-              <TabsTrigger value="weekly">Weekly</TabsTrigger>
-              <TabsTrigger value="monthly">Monthly</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="daily" className="space-y-4">
-              <div className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                    <XAxis 
-                      dataKey="date" 
-                      stroke="#888888" 
-                      tickFormatter={(date) => new Date(date).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })} 
-                    />
-                    <YAxis 
-                      stroke="#888888" 
-                      domain={['auto', 'auto']}
-                      tickFormatter={(value) => `$${value}`}
-                    />
-                    <Tooltip 
-                      formatter={(value, name) => [
-                        `$${value}`, name === 'price' ? 'Price' : 'Volume'
-                      ]}
-                      labelFormatter={(label) => new Date(label).toLocaleString(undefined, { 
-                        year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
-                      })}
-                    />
-                    <Legend />
-                    <Line 
-                      type="monotone" 
-                      dataKey="price" 
-                      stroke="#8884d8" 
-                      strokeWidth={2}
-                      dot={{ r: 3 }}
-                      activeDot={{ r: 6 }}
-                      name="Price"
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="weekly" className="space-y-4">
-              <div className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                    <XAxis 
-                      dataKey="date" 
-                      stroke="#888888" 
-                      tickFormatter={(date) => new Date(date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} 
-                    />
-                    <YAxis 
-                      stroke="#888888" 
-                      domain={['auto', 'auto']}
-                      tickFormatter={(value) => `$${value}`}
-                    />
-                    <Tooltip 
-                      formatter={(value, name) => [
-                        `$${value}`, name === 'price' ? 'Price' : 'Volume'
-                      ]}
-                      labelFormatter={(label) => new Date(label).toLocaleDateString(undefined, { 
-                        year: 'numeric', month: 'long', day: 'numeric' 
-                      })}
-                    />
-                    <Legend />
-                    <Line 
-                      type="monotone" 
-                      dataKey="price" 
-                      stroke="#8884d8" 
-                      strokeWidth={2}
-                      dot={{ r: 3 }}
-                      activeDot={{ r: 6 }}
-                      name="Price"
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="monthly" className="space-y-4">
-              <div className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                    <XAxis 
-                      dataKey="date" 
-                      stroke="#888888" 
-                      tickFormatter={(date) => new Date(date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} 
-                    />
-                    <YAxis 
-                      stroke="#888888" 
-                      domain={['auto', 'auto']}
-                      tickFormatter={(value) => `$${value}`}
-                    />
-                    <Tooltip 
-                      formatter={(value, name) => [
-                        `$${value}`, name === 'price' ? 'Price' : 'Volume'
-                      ]}
-                      labelFormatter={(label) => new Date(label).toLocaleDateString(undefined, { 
-                        year: 'numeric', month: 'long', day: 'numeric' 
-                      })}
-                    />
-                    <Legend />
-                    <Line 
-                      type="monotone" 
-                      dataKey="price" 
-                      stroke="#8884d8" 
-                      strokeWidth={2}
-                      dot={{ r: 3 }}
-                      activeDot={{ r: 6 }}
-                      name="Price"
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </TabsContent>
-          </Tabs>
+          <div className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis 
+                  dataKey="date" 
+                  stroke="#888888" 
+                  tickFormatter={(date) => new Date(date).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })} 
+                />
+                <YAxis 
+                  stroke="#888888" 
+                  domain={['auto', 'auto']}
+                  tickFormatter={(value) => `$${value}`}
+                />
+                <Tooltip 
+                  formatter={(value, name) => [
+                    `$${value}`, name === 'price' ? 'Price' : 'Volume'
+                  ]}
+                  labelFormatter={(label) => new Date(label).toLocaleString(undefined, { 
+                    year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+                  })}
+                />
+                <Legend />
+                <Line 
+                  type="monotone" 
+                  dataKey="price" 
+                  stroke="#8884d8" 
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                  activeDot={{ r: 6 }}
+                  name="Price"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </CardContent>
       </Card>
 
