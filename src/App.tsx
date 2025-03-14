@@ -16,7 +16,6 @@ const Login = lazy(() => import("./pages/auth/Login"));
 const Register = lazy(() => import("./pages/auth/Register"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Market = lazy(() => import("./pages/Market"));
-const Portfolio = lazy(() => import("./pages/Portfolio"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Chat = lazy(() => import("./pages/Chat"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -58,14 +57,6 @@ const App = () => (
                       element={
                         <RequireAuth>
                           <Market />
-                        </RequireAuth>
-                      } 
-                    />
-                    <Route 
-                      path="/portfolio" 
-                      element={
-                        <RequireAuth>
-                          <Portfolio />
                         </RequireAuth>
                       } 
                     />

@@ -47,12 +47,6 @@ const Navbar = () => {
               )}>
                 Market
               </Link>
-              <Link to="/portfolio" className={cn(
-                "transition-colors",
-                isSquidGame ? "text-[#037a76] hover:text-[#ed1b76]" : "text-gray-300 hover:text-white"
-              )}>
-                Portfolio
-              </Link>
               <Link to="/chat" className={cn(
                 "transition-colors",
                 isSquidGame ? "text-[#037a76] hover:text-[#ed1b76]" : "text-gray-300 hover:text-white"
@@ -117,16 +111,6 @@ const Navbar = () => {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Market
-                </Link>
-                <Link
-                  to="/portfolio"
-                  className={cn(
-                    "transition-colors",
-                    isSquidGame ? "text-[#037a76] hover:text-[#ed1b76]" : "text-gray-300 hover:text-white"
-                  )}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Portfolio
                 </Link>
                 <Link
                   to="/chat"
