@@ -93,20 +93,22 @@ export default function MarketPage() {
                   className="glass-panel hover:shadow-lg transition-shadow"
                 >
                   <CardContent className="flex items-center justify-between p-4">
-                    <div>
+                    <div className="flex-1">
                       <h3 className="text-lg font-semibold">{stock.symbol}</h3>
                       <p className="text-sm text-muted-foreground">{stock.name}</p>
                       <p className="text-xs text-muted-foreground">{stock.sector}</p>
                     </div>
-                    <div className="text-right"></div>
-                      <p className="text-lg font-semibold">${stock.currentPrice.toFixed(2)}</p>
-                      <p className={`text-sm ${priceChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    <div className="text-center flex-1">
+                      <p className="text-lg font-semibold tabular-nums">${stock.currentPrice.toFixed(2)}</p>
+                      <p className={`text-sm tabular-nums ${priceChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                         {priceChange >= 0 ? '+' : ''}
                         {percentageChange}%
                       </p>
+                    </div>
                     <Button 
                       variant="ghost" 
                       size="icon"
+                      className="ml-4 flex-none"
                       onClick={(e) => {
                         e.stopPropagation();
                         // Add favorite functionality here
