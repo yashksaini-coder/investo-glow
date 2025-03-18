@@ -1,69 +1,22 @@
-# Welcome to your Lovable project
+<div align="center">
+<h1>Investo Glow</h1>
+    <img src="public/demo.png" alt="Investo Glow Logo">
+</div>
 
-## Project info
+<br>
 
-**URL**: https://lovable.dev/projects/009ef30b-898d-4e54-a037-68832834a075
+**Investo Glow**, An application that provides investment insights by summarizing recent market trends, explaining financial terms. User queries are answered based on real-time data using AI agent service. Showing the stock markets and providing insights on the same. The application also provides a platform for users to discuss their investment strategies.
 
-## How can I edit this code?
+## Tech Stack
 
-There are several ways of editing your application.
+| Logo                                                 | Technology                                        | Description                                                                                  |
+| ---------------------------------------------------- | ------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| ![Typescript](https://skillicons.dev/icons?i=ts)     | **[TypeScript](https://www.typescriptlang.org/)** | Strongly typed programming language for enhanced development                                 |
+| ![Vite.Js](https://skillicons.dev/icons?i=vite)      | **[Vite.js](https://nextjs.org/)**                | Vite is a blazing fast frontend build tool powering the next generation of web applications. |
+| ![React](https://skillicons.dev/icons?i=react)       | **[React](https://react.dev/)**                   | The library for web and native user interfaces                                               |
+| ![Tailwind](https://skillicons.dev/icons?i=tailwind) | **[Tailwind](https://tailwindcss.com/)**          | Utility-first CSS framework for modern designs                                               |
+| ![Vercel](https://skillicons.dev/icons?i=vercel)     | **[Vercel](https://vercel.com/home)**             | Platform for deploying and hosting web applications                                          |
+| ![Shadcn](public/shadcn.png)                         | **[Shadcn](https://ui.shadcn.com/)**              | A set of beautifully-designed, accessible components and a code distribution platform        |
 
-**Use Lovable**
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/009ef30b-898d-4e54-a037-68832834a075) and start prompting.
 
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with .
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/009ef30b-898d-4e54-a037-68832834a075) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
