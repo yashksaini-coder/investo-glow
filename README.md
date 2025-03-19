@@ -26,14 +26,14 @@
 
 ## Tech Stack
 
-| Technology                                                                                         | Description                                                  |
-| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| ![Typescript](https://skillicons.dev/icons?i=ts) **[TypeScript](https://www.typescriptlang.org/)** | Strongly typed programming language for enhanced development |
-| ![Vite.Js](https://skillicons.dev/icons?i=vite) **[Vite.js](https://nextjs.org/)**                 | Blazing fast frontend build tool for modern web applications |
-| ![React](https://skillicons.dev/icons?i=react) **[React](https://react.dev/)**                     | Library for building user interfaces                         |
-| ![Tailwind](https://skillicons.dev/icons?i=tailwind) **[Tailwind](https://tailwindcss.com/)**      | Utility-first CSS framework for modern designs               |
-| ![Vercel](https://skillicons.dev/icons?i=vercel) **[Vercel](https://vercel.com/home)**             | Platform for deploying and hosting web applications          |
-| ![Shadcn](public/shadcn.png) **[Shadcn](https://ui.shadcn.com/)**                                  | Beautiful, accessible UI components                          |
+| Technology | Link | Description |
+|------------|------|-------------|
+| ![Typescript](https://skillicons.dev/icons?i=ts)| **[TypeScript](https://www.typescriptlang.org/)** | Strongly typed programming language for enhanced development |
+| ![Vite.Js](https://skillicons.dev/icons?i=vite) | **[Vite.js](https://vitejs.dev/)** | Blazing fast frontend build tool for modern web applications |
+| ![React](https://skillicons.dev/icons?i=react) | **[React](https://react.dev/)** | Library for building user interfaces |
+| ![Tailwind](https://skillicons.dev/icons?i=tailwind) | **[Tailwind](https://tailwindcss.com/)** | Utility-first CSS framework for modern designs |
+| ![Vercel](https://skillicons.dev/icons?i=vercel) | **[Vercel](https://vercel.com/home)** | Platform for deploying and hosting web applications |
+| ![Shadcn](public/shadcn.png) | **[Shadcn](https://ui.shadcn.com/)** | Beautiful, accessible UI components |
 
 ## Design
 
