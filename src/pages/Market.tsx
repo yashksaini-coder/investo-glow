@@ -108,14 +108,11 @@ export default function MarketPage() {
                         {percentageChange}%
                       </p>
                     </div>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="icon"
                       className="ml-4 flex-none"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        // Add favorite functionality here
-                      }}
+                      onClick={handleWatchlistToggle}
                     >
                       <Star className={`h-4 w-4 ${isInWatchlist ? "fill-yellow-500 text-yellow-500" : ""}`} />
                     </Button>
