@@ -112,7 +112,11 @@ export default function MarketPage() {
                       variant="ghost"
                       size="icon"
                       className="ml-4 flex-none"
-                      onClick={handleWatchlistToggle}
+                      onClick={ (e)=>{
+                        e.preventDefault();  
+                        e.stopPropagation();
+                        handleWatchlistToggle(e);
+                      } }
                     >
                       <Star className={`h-4 w-4 ${isInWatchlist ? "fill-yellow-500 text-yellow-500" : ""}`} />
                     </Button>
