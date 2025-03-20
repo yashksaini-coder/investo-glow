@@ -7,6 +7,8 @@ import { useWatchlist } from '@/contexts/WatchlistContext';
 import { useToast } from '@/components/ui/use-toast';
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/types/supabase';
 import {
   Dialog,
   DialogContent,
@@ -24,6 +26,8 @@ interface StockData {
   previousClose: number;
   sector: string;
 }
+
+type CustomStock = Database['public']['Tables']['custom_stocks']['Row'];
 
 const stock_url = import.meta.env.VITE_PUBLIC_SERVER_URL;
 
@@ -51,15 +55,68 @@ export default function MarketPage() {
     return matchesSearch && (!showStarredOnly || isStarred);
   });
   
+  const fetchCustomStocks = async (userId: string) => {
+    try {
+      const { data: customStocks, error } = await supabase
+        .from('custom_stocks')
+        .select('*')
+        .eq('user_id', userId)
+        .returns<CustomStock[]>();
+      
+      if (error) throw error;
+
+      // Fetch data for each custom stock
+      const customStockData = await Promise.all(
+        (customStocks || []).map(async (stock: CustomStock) => {
+          try {
+            const response = await fetch(`${stock_url}stock/${stock.symbol}`);
+            if (!response.ok) return null;
+            return response.json();
+          } catch {
+            return null;
+          }
+        })
+      );
+
+      // Filter out any failed requests and add to market data
+      const validStockData = customStockData.filter((data): data is StockData => data !== null);
+      return validStockData;
+    } catch (error) {
+      console.error('Error fetching custom stocks:', error);
+      return [];
+    }
+  };
+
   useEffect(() => {
-    const fetchStockData = async () => {
+    const fetchAllStockData = async () => {
       try {
+        // Get current user
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError) throw userError;
+
+        if (!user) {
+          throw new Error('No authenticated user found');
+        }
+
+        // Fetch default stocks
         const response = await fetch(`${stock_url}top-stocks`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = await response.json();
-        setMarketData(data);
+        const defaultStocks = await response.json();
+
+        // Fetch custom stocks
+        const customStocks = await fetchCustomStocks(user.id);
+
+        // Combine both sets of stocks, avoiding duplicates
+        const allStocks = [...defaultStocks];
+        customStocks.forEach(customStock => {
+          if (!allStocks.some(stock => stock.symbol === customStock.symbol)) {
+            allStocks.push(customStock);
+          }
+        });
+
+        setMarketData(allStocks);
         setError(null);
       } catch (error) {
         setError('Failed to fetch market data. Please try again later.');
@@ -69,8 +126,8 @@ export default function MarketPage() {
       }
     };
     
-    fetchStockData();
-    const interval = setInterval(fetchStockData, 10000);
+    fetchAllStockData();
+    const interval = setInterval(fetchAllStockData, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -115,6 +172,15 @@ export default function MarketPage() {
 
     setAddingStock(true);
     try {
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError) throw userError;
+
+      if (!user) {
+        throw new Error('No authenticated user found');
+      }
+
+      // Fetch stock data to validate
       const response = await fetch(`${stock_url}stock/${newStockSymbol.toUpperCase()}`);
       if (!response.ok) {
         throw new Error(`Stock not found or invalid symbol`);
@@ -130,6 +196,17 @@ export default function MarketPage() {
         return;
       }
 
+      // Save to custom_stocks table
+      const { error: insertError } = await supabase
+        .from('custom_stocks')
+        .insert({ 
+          symbol: stockData.symbol,
+          user_id: user.id
+        });
+
+      if (insertError) throw insertError;
+
+      // Update local state
       setMarketData(prev => [...prev, stockData]);
       setNewStockSymbol('');
       setShowAddStock(false);
