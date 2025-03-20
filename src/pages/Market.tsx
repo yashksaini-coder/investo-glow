@@ -2,11 +2,18 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Star } from 'lucide-react';
+import { Search, Star, X } from 'lucide-react';
 import { useWatchlist } from '@/contexts/WatchlistContext';
 import { useToast } from '@/components/ui/use-toast';
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import TradingViewWidget from './TradingViewWidget';
 
 interface StockData {
   symbol: string;
@@ -24,6 +31,7 @@ export default function MarketPage() {
   const [marketData, setMarketData] = useState<StockData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedStock, setSelectedStock] = useState<StockData | null>(null);
   const { watchlist, addToWatchlist, removeFromWatchlist } = useWatchlist();
   const { toast } = useToast();
 
@@ -61,7 +69,8 @@ export default function MarketPage() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleWatchlistToggle = async (stock: StockData, isInWatchlist: boolean) => {
+  const handleWatchlistToggle = async (stock: StockData, isInWatchlist: boolean, e: React.MouseEvent) => {
+    e.stopPropagation();
     try {
       if (isInWatchlist) {
         const watchlistItem = watchlist.find((item) => item.symbol === stock.symbol);
@@ -128,7 +137,7 @@ export default function MarketPage() {
               : "No stocks match your search criteria"}
           </div>
         ) : (
-          <div className="grid gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredStocks.map((stock) => {
               const priceChange = stock.currentPrice - stock.previousClose;
               const percentageChange = ((priceChange / stock.previousClose) * 100).toFixed(2);
@@ -137,35 +146,53 @@ export default function MarketPage() {
               return (
                 <Card 
                   key={stock.symbol} 
-                  className="glass-panel hover:shadow-lg transition-shadow"
+                  className="glass-panel hover:shadow-lg transition-shadow cursor-pointer"
+                  onClick={() => setSelectedStock(stock)}
                 >
-                  <CardContent className="flex items-center justify-between p-4">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold">{stock.symbol}</h3>
-                      <p className="text-sm text-muted-foreground">{stock.name}</p>
-                      <p className="text-xs text-muted-foreground">{stock.sector}</p>
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="text-xl font-semibold">{stock.symbol}</h3>
+                        <p className="text-sm text-muted-foreground">{stock.name}</p>
+                        <p className="text-xs text-muted-foreground">{stock.sector}</p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="flex-none"
+                        onClick={(e) => handleWatchlistToggle(stock, isInWatchlist, e)}
+                      >
+                        <Star className={`h-5 w-5 ${isInWatchlist ? "fill-yellow-500 text-yellow-500" : ""}`} />
+                      </Button>
                     </div>
-                    <div className="text-center flex-1">
-                      <p className="text-lg font-semibold tabular-nums">${stock.currentPrice.toFixed(2)}</p>
-                      <p className={`text-sm tabular-nums ${priceChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    <div className="mt-4">
+                      <p className="text-2xl font-bold tabular-nums">${stock.currentPrice.toFixed(2)}</p>
+                      <p className={`text-lg tabular-nums ${priceChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                         {priceChange >= 0 ? '+' : ''}
                         {percentageChange}%
                       </p>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="ml-4 flex-none"
-                      onClick={() => handleWatchlistToggle(stock, isInWatchlist)}
-                    >
-                      <Star className={`h-4 w-4 ${isInWatchlist ? "fill-yellow-500 text-yellow-500" : ""}`} />
-                    </Button>
                   </CardContent>
                 </Card>
               );
             })}
           </div>
         )}
+
+        <Dialog open={!!selectedStock} onOpenChange={() => setSelectedStock(null)}>
+          <DialogContent className="max-w-4xl">
+            <DialogHeader>
+              <DialogTitle>
+                {selectedStock?.symbol} - {selectedStock?.name}
+              </DialogTitle>
+            </DialogHeader>
+            {selectedStock && (
+              <div className="mt-4">
+                <TradingViewWidget symbol={selectedStock.symbol} />
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </main>
     </>
   );

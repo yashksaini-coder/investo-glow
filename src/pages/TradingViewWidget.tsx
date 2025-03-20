@@ -1,7 +1,11 @@
 // TradingViewWidget.jsx
 import React, { useEffect, useRef, memo } from 'react';
 
-function TradingViewWidget() {
+interface TradingViewWidgetProps {
+  symbol: string;
+}
+
+function TradingViewWidget({ symbol }: TradingViewWidgetProps) {
   const container = useRef<HTMLDivElement>(null);
 
   useEffect(
@@ -13,7 +17,7 @@ function TradingViewWidget() {
       script.innerHTML = `
         {
           "autosize": true,
-          "symbol": "NASDAQ:TSLA",
+          "symbol": "${symbol}",
           "interval": "D",
           "timezone": "Etc/UTC",
           "theme": "dark",
@@ -25,7 +29,7 @@ function TradingViewWidget() {
         }`;
       container.current?.appendChild(script);
     },
-    []
+    [symbol]
   );
 
   return (
