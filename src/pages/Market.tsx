@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Star, X } from 'lucide-react';
+import { Search, Star, Plus, Loader2 } from 'lucide-react';
 import { useWatchlist } from '@/contexts/WatchlistContext';
 import { useToast } from '@/components/ui/use-toast';
 import { Switch } from "@/components/ui/switch";
@@ -12,6 +12,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import TradingViewWidget from './TradingViewWidget';
 
@@ -32,6 +34,9 @@ export default function MarketPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedStock, setSelectedStock] = useState<StockData | null>(null);
+  const [showAddStock, setShowAddStock] = useState(false);
+  const [newStockSymbol, setNewStockSymbol] = useState('');
+  const [addingStock, setAddingStock] = useState(false);
   const { watchlist, addToWatchlist, removeFromWatchlist } = useWatchlist();
   const { toast } = useToast();
 
@@ -98,6 +103,51 @@ export default function MarketPage() {
     }
   };
 
+  const handleAddStock = async () => {
+    if (!newStockSymbol.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a stock symbol",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setAddingStock(true);
+    try {
+      const response = await fetch(`${stock_url}stock/${newStockSymbol.toUpperCase()}`);
+      if (!response.ok) {
+        throw new Error(`Stock not found or invalid symbol`);
+      }
+      const stockData = await response.json();
+      
+      // Check if stock already exists
+      if (marketData.some(stock => stock.symbol === stockData.symbol)) {
+        toast({
+          title: "Info",
+          description: "This stock is already in your list",
+        });
+        return;
+      }
+
+      setMarketData(prev => [...prev, stockData]);
+      setNewStockSymbol('');
+      setShowAddStock(false);
+      toast({
+        title: "Success",
+        description: `${stockData.symbol} has been added to your list`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to add stock",
+        variant: "destructive",
+      });
+    } finally {
+      setAddingStock(false);
+    }
+  };
+
   return (
     <>
       <main className="container mx-auto px-4 py-8">
@@ -121,6 +171,14 @@ export default function MarketPage() {
               />
               <Label htmlFor="starred-filter">Show Starred Only</Label>
             </div>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setShowAddStock(true)}
+              title="Add Custom Stock"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
           </div>
         </div>
 
@@ -191,6 +249,51 @@ export default function MarketPage() {
                 <TradingViewWidget symbol={selectedStock.symbol} />
               </div>
             )}
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={showAddStock} onOpenChange={setShowAddStock}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add Custom Stock</DialogTitle>
+              <DialogDescription>
+                Enter a stock symbol to add it to your list
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              <Input
+                placeholder="Enter stock symbol (e.g., AAPL)"
+                value={newStockSymbol}
+                onChange={(e) => setNewStockSymbol(e.target.value.toUpperCase())}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !addingStock) {
+                    handleAddStock();
+                  }
+                }}
+              />
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setShowAddStock(false)}
+                disabled={addingStock}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleAddStock}
+                disabled={addingStock || !newStockSymbol.trim()}
+              >
+                {addingStock ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Adding...
+                  </>
+                ) : (
+                  'Add Stock'
+                )}
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </main>
