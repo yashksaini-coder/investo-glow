@@ -4,6 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Star } from 'lucide-react';
 import { useWatchlist } from '@/contexts/WatchlistContext';
+import { useToast } from '@/components/ui/use-toast';
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+
 interface StockData {
   symbol: string;
   name: string;
@@ -16,19 +20,26 @@ const stock_url = import.meta.env.VITE_PUBLIC_SERVER_URL;
 
 export default function MarketPage() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [showStarredOnly, setShowStarredOnly] = useState(false);
   const [marketData, setMarketData] = useState<StockData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { watchlist, addToWatchlist, removeFromWatchlist } = useWatchlist();
-  // Filter stocks based on search query
-  const filteredStocks = marketData.filter(stock => 
-    stock.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    stock.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const { toast } = useToast();
+
+  // Filter stocks based on search query and starred filter
+  const filteredStocks = marketData.filter(stock => {
+    const matchesSearch = 
+      stock.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      stock.name.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const isStarred = watchlist.some((item) => item.symbol === stock.symbol);
+    
+    return matchesSearch && (!showStarredOnly || isStarred);
+  });
   
   useEffect(() => {
     const fetchStockData = async () => {
-      setLoading(true);
       try {
         const response = await fetch(`${stock_url}top-stocks`);
         if (!response.ok) {
@@ -50,12 +61,40 @@ export default function MarketPage() {
     return () => clearInterval(interval);
   }, []);
 
+  const handleWatchlistToggle = async (stock: StockData, isInWatchlist: boolean) => {
+    try {
+      if (isInWatchlist) {
+        const watchlistItem = watchlist.find((item) => item.symbol === stock.symbol);
+        if (watchlistItem) {
+          await removeFromWatchlist(watchlistItem.id);
+          toast({
+            title: "Success",
+            description: `${stock.symbol} removed from watchlist`,
+          });
+        }
+      } else {
+        await addToWatchlist(stock.symbol);
+        toast({
+          title: "Success",
+          description: `${stock.symbol} added to watchlist`,
+        });
+      }
+    } catch (error) {
+      console.error('Watchlist operation failed:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update watchlist",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <>
       <main className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Market</h1>
-          <div className="flex gap-4">
+          <div className="flex items-center gap-4">
             <div className="relative">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -64,6 +103,14 @@ export default function MarketPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-8"
               />
+            </div>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="starred-filter"
+                checked={showStarredOnly}
+                onCheckedChange={setShowStarredOnly}
+              />
+              <Label htmlFor="starred-filter">Show Starred Only</Label>
             </div>
           </div>
         </div>
@@ -74,21 +121,18 @@ export default function MarketPage() {
           <div className="py-8 text-center text-red-500">{error}</div>
         ) : marketData.length === 0 ? (
           <div className="text-center py-4">No stocks data available</div>
+        ) : filteredStocks.length === 0 ? (
+          <div className="text-center py-4">
+            {showStarredOnly 
+              ? "No starred stocks found" 
+              : "No stocks match your search criteria"}
+          </div>
         ) : (
           <div className="grid gap-4">
             {filteredStocks.map((stock) => {
               const priceChange = stock.currentPrice - stock.previousClose;
               const percentageChange = ((priceChange / stock.previousClose) * 100).toFixed(2);
               const isInWatchlist = watchlist.some((item) => item.symbol === stock.symbol);
-              const handleWatchlistToggle = async (e: React.MouseEvent) => {
-                e.stopPropagation();
-                if (isInWatchlist) {
-                  const watchlistItem = watchlist.find((item) => item.symbol === stock.symbol);
-                  if (watchlistItem) await removeFromWatchlist(watchlistItem.id);
-                } else {
-                  await addToWatchlist(stock.symbol);
-                }
-              };
 
               return (
                 <Card 
@@ -112,11 +156,7 @@ export default function MarketPage() {
                       variant="ghost"
                       size="icon"
                       className="ml-4 flex-none"
-                      onClick={ (e)=>{
-                        e.preventDefault();  
-                        e.stopPropagation();
-                        handleWatchlistToggle(e);
-                      } }
+                      onClick={() => handleWatchlistToggle(stock, isInWatchlist)}
                     >
                       <Star className={`h-4 w-4 ${isInWatchlist ? "fill-yellow-500 text-yellow-500" : ""}`} />
                     </Button>
