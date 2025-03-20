@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Star } from 'lucide-react';
-
+import { useWatchlist } from '@/contexts/WatchlistContext';
 interface StockData {
   symbol: string;
   name: string;
@@ -19,7 +19,7 @@ export default function MarketPage() {
   const [marketData, setMarketData] = useState<StockData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const { watchlist, addToWatchlist, removeFromWatchlist } = useWatchlist();
   // Filter stocks based on search query
   const filteredStocks = marketData.filter(stock => 
     stock.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -44,7 +44,7 @@ export default function MarketPage() {
         setLoading(false);
       }
     };
-
+    
     fetchStockData();
     const interval = setInterval(fetchStockData, 10000);
     return () => clearInterval(interval);
@@ -79,6 +79,16 @@ export default function MarketPage() {
             {filteredStocks.map((stock) => {
               const priceChange = stock.currentPrice - stock.previousClose;
               const percentageChange = ((priceChange / stock.previousClose) * 100).toFixed(2);
+              const isInWatchlist = watchlist.some((item) => item.symbol === stock.symbol);
+              const handleWatchlistToggle = async (e: React.MouseEvent) => {
+                e.stopPropagation();
+                if (isInWatchlist) {
+                  const watchlistItem = watchlist.find((item) => item.symbol === stock.symbol);
+                  if (watchlistItem) await removeFromWatchlist(watchlistItem.id);
+                } else {
+                  await addToWatchlist(stock.symbol);
+                }
+              };
 
               return (
                 <Card 
@@ -98,16 +108,17 @@ export default function MarketPage() {
                         {percentageChange}%
                       </p>
                     </div>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="icon"
                       className="ml-4 flex-none"
-                      onClick={(e) => {
+                      onClick={ (e)=>{
+                        e.preventDefault();  
                         e.stopPropagation();
-                        // Add favorite functionality here
-                      }}
+                        handleWatchlistToggle(e);
+                      } }
                     >
-                      <Star className="h-4 w-4" />
+                      <Star className={`h-4 w-4 ${isInWatchlist ? "fill-yellow-500 text-yellow-500" : ""}`} />
                     </Button>
                   </CardContent>
                 </Card>
