@@ -34,6 +34,7 @@
 | ![Tailwind](https://skillicons.dev/icons?i=tailwind) | **[Tailwind](https://tailwindcss.com/)** | Utility-first CSS framework for modern designs |
 | ![Vercel](https://skillicons.dev/icons?i=vercel) | **[Vercel](https://vercel.com/home)** | Platform for deploying and hosting web applications |
 | ![Shadcn](public/shadcn.png) | **[Shadcn](https://ui.shadcn.com/)** | Beautiful, accessible UI components |
+| ![Supabase](https://skillicons.dev/icons?i=supabase)| **[Supabase](https://supabase.com/)** | Open-source Firebase alternative for database and authentication |
 
 ## Design
 
