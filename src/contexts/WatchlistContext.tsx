@@ -14,6 +14,7 @@ interface WatchlistContextType {
   removeFromWatchlist: (id: string) => Promise<void>;
   loading: boolean;
 }
+
 const WatchlistContext = createContext<WatchlistContextType | undefined>(undefined);
 
 export const WatchlistProvider = ({ children }: { children: React.ReactNode }) => {
@@ -50,14 +51,19 @@ export const WatchlistProvider = ({ children }: { children: React.ReactNode }) =
   };
 
   const fetchWatchlist = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('watchlist')
-      .select('*')
-      .eq('user_id', userId);
+    try {
+      const { data, error } = await supabase
+        .from('watchlist')
+        .select('*')
+        .eq('user_id', userId);
 
-    if (error) throw error;
+      if (error) throw error;
 
-    setWatchlist(data || []);
+      setWatchlist(data || []);
+    } catch (error) {
+      console.error('Error fetching watchlist:', error);
+      throw error;
+    }
   };
 
   const addToWatchlist = async (symbol: string) => {
@@ -71,25 +77,28 @@ export const WatchlistProvider = ({ children }: { children: React.ReactNode }) =
     }
 
     try {
+      // Check if stock is already in watchlist
+      const existingItem = watchlist.find(item => item.symbol === symbol);
+      if (existingItem) {
+        toast({
+          title: "Info",
+          description: `${symbol} is already in your watchlist`,
+        });
+        return;
+      }
+
       const { data, error } = await supabase
         .from('watchlist')
         .insert({ symbol, user_id: userId })
+        .select()
         .single();
 
       if (error) throw error;
 
-      setWatchlist([...watchlist, data] as WatchlistItem[]);
-      toast({
-        title: "Success",
-        description: `${symbol} added to watchlist`,
-      });
+      setWatchlist(prev => [...prev, data]);
     } catch (error) {
       console.error('Error adding to watchlist:', error);
-      toast({
-        title: "Error",
-        description: "Failed to add stock to watchlist",
-        variant: "destructive",
-      });
+      throw error;
     }
   };
 
@@ -102,18 +111,10 @@ export const WatchlistProvider = ({ children }: { children: React.ReactNode }) =
 
       if (error) throw error;
 
-      setWatchlist(watchlist.filter(item => item.id !== id));
-      toast({
-        title: "Success",
-        description: "Stock removed from watchlist",
-      });
+      setWatchlist(prev => prev.filter(item => item.id !== id));
     } catch (error) {
       console.error('Error removing from watchlist:', error);
-      toast({
-        title: "Error",
-        description: "Failed to remove stock from watchlist",
-        variant: "destructive",
-      });
+      throw error;
     }
   };
 
