@@ -30,13 +30,13 @@ const Layout = ({ children }: LayoutProps) => {
       <main className="flex-1 pt-16 container mx-auto px-4">
         {children}
       </main>
-      <Button 
+      {/* <Button 
         onClick={toggleTheme}
         className="theme-toggle"
         aria-label="Toggle theme"
       >
         {theme === 'default' ? '🦑' : '🌙'}
-      </Button>
+      </Button> */}
       <Footer />
     </div>
   );

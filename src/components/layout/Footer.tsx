@@ -88,19 +88,19 @@ const Footer = () => {
               isSquidGame && "text-[#ed1b76]"
             )}>Connect</h3>
             <div className="flex space-x-4">
-              <a href="#" className={cn(
+              <a href="https://github.com/yashksaini-coder" className={cn(
                 "text-muted-foreground hover:text-primary",
                 isSquidGame && "text-[#037a76] hover:text-[#ed1b76]"
               )}>
                 <Github className="h-5 w-5" />
               </a>
-              <a href="#" className={cn(
+              <a href="https://x.com/yash_k_saini" className={cn(
                 "text-muted-foreground hover:text-primary",
                 isSquidGame && "text-[#037a76] hover:text-[#ed1b76]"
               )}>
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" className={cn(
+              <a href="https://www.linkedin.com/in/yashksaini/" className={cn(
                 "text-muted-foreground hover:text-primary",
                 isSquidGame && "text-[#037a76] hover:text-[#ed1b76]"
               )}>
