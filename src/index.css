@@ -121,50 +121,54 @@
   width: 100% !important;
 }
 
-/* Add additional styles for specific text elements */
 [data-theme='squid-game'] {
-  /* Make headings and important text pink */
+  /* Make headings with a deeper, more readable pink */
   h1, h2, h3, h4, h5, h6 {
-    color: #ed1b76 !important;
+    color: #d81560 !important;
   }
   
-  /* Make regular text teal for contrast */
+  /* Make regular text darker teal for better readability */
   p, span, div {
-    color: #037a76;
+    color: #025853;
   }
   
-  /* Make links and interactive elements pink with teal hover */
+  /* Links with better contrast and interaction states */
   a:not([class*="button"]) {
-    color: #ed1b76;
+    color: #d81560;
+    transition: color 0.2s ease;
   }
   
   a:not([class*="button"]):hover {
-    color: #037a76;
+    color: #025853;
+    text-decoration: underline;
   }
   
-  /* Make form input text pink */
+  /* Form elements with softer colors */
   input, textarea, select {
-    color: #ed1b76 !important;
+    color: #d81560 !important;
+    background-color: rgba(255, 255, 255, 0.9);
   }
   
-  /* Make placeholder text teal */
+  /* More visible placeholder text */
   ::placeholder {
-    color: #037a76 !important;
-    opacity: 0.7;
-  }
-  
-  /* Make muted text pink but slightly transparent */
-  .text-muted-foreground {
-    color: #ed1b76 !important;
+    color: #468885 !important;
     opacity: 0.8;
   }
   
-  /* Make card titles and content more visible */
+  /* Muted text with better contrast */
+  .text-muted-foreground {
+    color: #d81560 !important;
+    opacity: 0.85;
+  }
+  
+  /* Card elements with enhanced contrast */
   .card-title {
-    color: #037a76	(3,122,118) !important;
+    color: #025853 !important;
+    font-weight: 600;
   }
   
   .card-content {
-    color: #037a76 !important;
+    color: #025853 !important;
+    opacity: 0.9;
   }
 }
