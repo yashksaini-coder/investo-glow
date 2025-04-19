@@ -17,6 +17,9 @@
     </p>
 </div>
 
+<a href="https://youtu.be/pwnYoB_GNPM" target="_blank"><h1>📺 Watch Demo Video</h1></a>
+ 
+
 ## Features
 
 - 🤖 **AI-Powered Insights**: Get real-time investment insights and market analysis powered by advanced AI
