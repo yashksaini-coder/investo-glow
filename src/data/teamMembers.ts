@@ -40,7 +40,7 @@ export const teamMembers: TeamMember[] = [
     id: 3,
     name: "Kushagra Singhal",
     role: "Senior Backend Engineer",
-    image: "",
+    image: "https://shorturl.at/0czuV",
     socialLinks: {
       linkedin: "https://linkedin.com/in/johndoe",
       github: "https://github.com/kushagra21-afk"
